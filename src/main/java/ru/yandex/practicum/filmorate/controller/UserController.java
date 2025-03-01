@@ -32,7 +32,7 @@ public class UserController {
         }
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             log.warn("Ошибка: Имейл должен быть указан");
-            throw new ValidationException("Имейл должен быть указан");
+            throw new ValidationException("Имейл  должен быть указан");
         }
         if (!user.getEmail().contains("@")) {
             log.warn("Ошибка: В имейле должна быть @");
