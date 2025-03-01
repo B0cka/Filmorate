@@ -39,7 +39,7 @@ public class UserController {
             throw new ValidationException("В имейле должна быть @");
         }
         if (user.getBirthday() == null || LocalDate.now().isBefore(user.getBirthday())) {
-            log.warn("Ошибка : Дата рождения не может быть в будущем");
+            log.warn("Ошибка  : Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
         if (user.getUsername() == null || user.getUsername().isBlank()) {
