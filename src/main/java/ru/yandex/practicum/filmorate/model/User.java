@@ -10,6 +10,5 @@ public class User {
     private String login;
     private String username;
     private LocalDate birthday;
-
 }
 
