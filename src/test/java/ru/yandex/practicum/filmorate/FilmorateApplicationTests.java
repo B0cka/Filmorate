@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 public class FilmorateApplicationTests {
 
-    private UserController userController;
+    private UserController userController = new UserController();
     private FilmController filmController;
     private User validUser;
     private Film validFilm;
