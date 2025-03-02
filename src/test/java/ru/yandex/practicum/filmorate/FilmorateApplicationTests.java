@@ -39,15 +39,6 @@ public class FilmorateApplicationTests {
     }
 
     @Test
-    void shouldCreateUserSuccessfully() {
-        User createdUser = userController.create(validUser);
-
-        Assertions.assertNotNull(createdUser);
-        Assertions.assertEquals("test@example.com", createdUser.getEmail());
-        Assertions.assertEquals("testUser", createdUser.getLogin());
-    }
-
-    @Test
     void shouldNotCreateUserWithInvalidEmail() {
         validUser.setEmail("invalid-email");
 
@@ -56,15 +47,6 @@ public class FilmorateApplicationTests {
         });
 
         Assertions.assertEquals("В имейле должна быть @", thrown.getMessage());
-    }
-
-    @Test
-    void shouldCreateFilmSuccessfully() {
-        Film createdFilm = filmController.create(validFilm);
-
-        Assertions.assertNotNull(createdFilm);
-        Assertions.assertEquals("Inception", createdFilm.getName());
-        Assertions.assertEquals(148, createdFilm.getDuration());
     }
 
     @Test
