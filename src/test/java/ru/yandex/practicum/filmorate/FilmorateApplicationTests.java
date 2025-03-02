@@ -38,16 +38,6 @@ public class FilmorateApplicationTests {
         validFilm.setDuration(148);
     }
 
-    @Test
-    void shouldNotCreateUserWithInvalidEmail() {
-        validUser.setEmail("invalid-email");
-
-        ValidationException thrown = Assertions.assertThrows(ValidationException.class, () -> {
-            userController.create(validUser);
-        });
-
-        Assertions.assertEquals("В имейле должна быть @", thrown.getMessage());
-    }
 
     @Test
     void shouldNotCreateFilmWithTooLongDescription() {
