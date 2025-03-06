@@ -71,7 +71,7 @@ public class UserController {
         }
         if (!newUser.getEmail().contains("@")) {
             log.warn("Ошибка: В имейле должна быть @");
-            throw new ValidationException("В имейле должна быть @");
+            throw new ValidationException("В имейл должна быть @");
         }
         if (newUser.getLogin() == null || newUser.getLogin().isBlank() || newUser.getLogin().contains(" ")) {
             log.warn("Ошибка: Логин не может быть пустым и содержать пробелы");
