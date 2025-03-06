@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+ controllers-films-users
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -92,4 +93,7 @@ public class FilmController {
                 .orElse(0);
         return ++currentMaxId;
     }
+
+public class FilmController {
+ main
 }
