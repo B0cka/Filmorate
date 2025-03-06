@@ -15,7 +15,6 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
-
     private final Map<Long, User> users = new HashMap<>();
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -33,13 +32,13 @@ public class UserController {
         }
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             log.warn("Ошибка: Имейл должен быть указан");
-            throw new ValidationException("Имейл  должен быть указан");
+            throw new ValidationException("Имейл должен быть указан");
         }
         if (!user.getEmail().contains("@")) {
             log.warn("Ошибка: В имейле должна быть @");
             throw new ValidationException("В имейле должна быть @");
         }
-        if (user.getBirthday() == null || LocalDate.now().isBefore(user.getBirthday())) {
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {  // Исправлена ошибка
             log.warn("Ошибка  : Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
@@ -72,13 +71,13 @@ public class UserController {
         }
         if (!newUser.getEmail().contains("@")) {
             log.warn("Ошибка: В имейле должна быть @");
-            throw new ValidationException("В имейл должна быть @");
+            throw new ValidationException("В имейле должна быть @");
         }
         if (newUser.getLogin() == null || newUser.getLogin().isBlank() || newUser.getLogin().contains(" ")) {
             log.warn("Ошибка: Логин не может быть пустым и содержать пробелы");
             throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
-        if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {
+        if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {  // Исправлена ошибка
             log.warn("Ошибка: Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
@@ -105,5 +104,4 @@ public class UserController {
                 .max()
                 .orElse(0) + 1;
     }
-
 }

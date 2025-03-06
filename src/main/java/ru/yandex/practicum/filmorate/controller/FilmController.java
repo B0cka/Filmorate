@@ -23,7 +23,7 @@ public class FilmController {
     @PostMapping
     public Film create(@RequestBody Film film) {
 
-        log.info("Получен запрос на создание пользователя: {}", film);
+        log.info("Получен запрос на создание фильма: {}", film);
 
         if (film.getName() == null) {
             log.warn("Ошибка: название не может быть пустым");
@@ -52,7 +52,7 @@ public class FilmController {
 
     @PutMapping
     public Film update(@RequestBody Film newFilm) {
-        log.info("Получен запрос на обновление пользователя: {}", newFilm);
+        log.info("Получен запрос на обновление фильма: {}", newFilm);
 
         if (newFilm.getId() == 0) {
             log.warn("Ошибка: Id должен быть указан");
@@ -73,7 +73,7 @@ public class FilmController {
         }
 
         films.put(newFilm.getId(), newFilm);
-        log.info("Фильм обновлён : {}", newFilm);
+        log.info("Фильм обновлён: {}", newFilm);
 
         return newFilm;
     }
@@ -92,5 +92,4 @@ public class FilmController {
                 .orElse(0);
         return ++currentMaxId;
     }
-
 }
