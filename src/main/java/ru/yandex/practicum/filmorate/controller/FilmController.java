@@ -25,10 +25,11 @@ public class FilmController {
 
         log.info("Получен запрос на создание фильма: {}", film);
 
-        if (film.getName() == null) {
+        if (film.getName() == null || film.getName().isBlank()) {
             log.warn("Ошибка: название не может быть пустым");
             throw new ValidationException("название не может быть пустым");
         }
+
         if (film.getDescription().length() > 200) {
             log.warn("Ошибка: максимальная длина описания — 200 символов");
             throw new ValidationException("максимальная длина описания — 200 символов");
