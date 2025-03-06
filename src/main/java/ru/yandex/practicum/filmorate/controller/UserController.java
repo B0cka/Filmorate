@@ -42,8 +42,8 @@ public class UserController {
             log.warn("Ошибка  : Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if (user.getUsername() == null || user.getUsername().isBlank()) {
-            user.setUsername(user.getLogin());
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
         }
 
         user.setId(getNextId());
@@ -81,8 +81,8 @@ public class UserController {
             log.warn("Ошибка: Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if (newUser.getUsername() == null || newUser.getUsername().isBlank()) {
-            newUser.setUsername(newUser.getLogin());
+        if (newUser.getName() == null || newUser.getName().isBlank()) {
+            newUser.setName(newUser.getLogin());
         }
 
         users.put(newUser.getId(), newUser);
