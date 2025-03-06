@@ -28,7 +28,7 @@ public class FilmorateApplicationTests {
         validUser = new User();
         validUser.setEmail("test@example.com");
         validUser.setLogin("testUser");
-        validUser.setUsername("Test");
+        validUser.setName("Test");
         validUser.setBirthday(LocalDate.parse("1990-01-01"));
 
         validFilm = new Film();
