@@ -35,7 +35,7 @@ public class FilmController {
         }
 
         if (film.getReleaseDate().isBefore(releaseDate)) {
-            log.warn("Ошибка  : Дата релиза — не раньше 28 декабря 1895 года");
+            log.warn("Ошибка: Дата релиза — не раньше 28 декабря 1895 года");
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
         }
 
@@ -59,7 +59,7 @@ public class FilmController {
             throw new ValidationException("Id должен быть указан");
         }
         if (!films.containsKey(newFilm.getId())) {
-            log.warn("Ошибка : Фильм с id={} не найден", newFilm.getId());
+            log.warn("Ошибка: Фильм с id={} не найден", newFilm.getId());
             throw new ValidationException("Фильм с id=" + newFilm.getId() + " не найден");
         }
 
