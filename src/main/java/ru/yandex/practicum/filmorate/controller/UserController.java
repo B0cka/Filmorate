@@ -21,7 +21,35 @@ public class UserController {
     @PostMapping
     public User create(@RequestBody User user) {
         log.info("Получен запрос на создание пользователя: {}", user);
+        validateUser(user);
+        user.setId(getNextId());
+        users.put(user.getId(), user);
+        log.info("Пользователь создан: {}", user);
+        return user;
+    }
 
+    @PutMapping
+    public User update(@RequestBody User newUser) {
+        log.info("Получен запрос на обновление пользователя: {}", newUser);
+
+        if (!users.containsKey(newUser.getId())) {
+            log.warn("Ошибка: Пользователь с id={} не найден", newUser.getId());
+            throw new ValidationException("Пользователь с id=" + newUser.getId() + " не найден");
+        }
+
+        validateUser(newUser);
+        users.put(newUser.getId(), newUser);
+        log.info("Пользователь обновлён: {}", newUser);
+        return newUser;
+    }
+
+    @GetMapping
+    public Collection<User> getAll() {
+        log.info("Запрос на получение всех пользователей");
+        return users.values();
+    }
+
+    private void validateUser(User user) {
         if (user.getLogin() == null || user.getLogin().isBlank()) {
             log.warn("Ошибка: Логин не может быть пустым");
             throw new ValidationException("Логин не может быть пустым");
@@ -38,63 +66,13 @@ public class UserController {
             log.warn("Ошибка: В имейле должна быть @");
             throw new ValidationException("В имейле должна быть @");
         }
-        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {  // Исправлена ошибка
-            log.warn("Ошибка  : Дата рождения не может быть в будущем");
+        if (user.getBirthday() == null || user.getBirthday().isAfter(LocalDate.now())) {
+            log.warn("Ошибка: Дата рождения не может быть в будущем");
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-
-        user.setId(getNextId());
-        users.put(user.getId(), user);
-
-        log.info("Пользователь создан: {}", user);
-        return user;
-    }
-
-    @PutMapping
-    public User update(@RequestBody User newUser) {
-        log.info("Получен запрос на обновление пользователя: {}", newUser);
-
-        if (newUser.getId() == 0) {
-            log.warn("Ошибка: Id должен быть указан");
-            throw new ValidationException("Id должен быть указан");
-        }
-        if (!users.containsKey(newUser.getId())) {
-            log.warn("Ошибка: Пользователь с id={} не найден", newUser.getId());
-            throw new ValidationException("Пользователь с id=" + newUser.getId() + " не найден");
-        }
-        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
-            log.warn("Ошибка: Имейл должен быть указан");
-            throw new ValidationException("Имейл должен быть указан");
-        }
-        if (!newUser.getEmail().contains("@")) {
-            log.warn("Ошибка: В имейле должна быть @");
-            throw new ValidationException("В имейле должна быть @");
-        }
-        if (newUser.getLogin() == null || newUser.getLogin().isBlank() || newUser.getLogin().contains(" ")) {
-            log.warn("Ошибка: Логин не может быть пустым и содержать пробелы");
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        }
-        if (newUser.getBirthday() == null || newUser.getBirthday().isAfter(LocalDate.now())) {  // Исправлена ошибка
-            log.warn("Ошибка: Дата рождения не может быть в будущем");
-            throw new ValidationException("Дата рождения не может быть в будущем");
-        }
-        if (newUser.getName() == null || newUser.getName().isBlank()) {
-            newUser.setName(newUser.getLogin());
-        }
-
-        users.put(newUser.getId(), newUser);
-        log.info("Пользователь обновлён: {}", newUser);
-
-        return newUser;
-    }
-
-    @GetMapping
-    public Collection<User> getAll() {
-        log.info("Запрос на получение всех пользователей");
-        return users.values();
     }
 
     private long getNextId() {
