@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.inMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final InMemoryFilmStorage inMemoryFilmStorage;
-    private final inMemoryUserStorage inMemoryUserStorage;
+    private final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, inMemoryUserStorage inMemoryUserStorage) {
+    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryFilmStorage = filmStorage;
         this.inMemoryUserStorage = inMemoryUserStorage;
     }

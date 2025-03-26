@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.inMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.Collection;
 
@@ -11,10 +11,10 @@ import java.util.Collection;
 @RequestMapping("/users")
 public class UserController {
 
-    final inMemoryUserStorage inMemoryUserStorage;
+    final InMemoryUserStorage inMemoryUserStorage;
 
     @Autowired
-    public UserController(inMemoryUserStorage inMemoryUserStorage) {
+    public UserController(InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 

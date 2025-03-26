@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.inMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import java.util.List;
 
@@ -12,11 +12,11 @@ import java.util.List;
 @RequestMapping("/users")
 public class FriendController {
 
-    final inMemoryUserStorage inMemoryUserStorage;
+    final InMemoryUserStorage inMemoryUserStorage;
     final UserService filmService;
 
     @Autowired
-    public FriendController(inMemoryUserStorage inMemoryUserStorage, UserService userService) {
+    public FriendController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
         this.inMemoryUserStorage = inMemoryUserStorage;
         this.filmService = userService;
     }
