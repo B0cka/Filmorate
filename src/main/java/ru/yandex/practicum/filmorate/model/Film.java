@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -12,6 +14,11 @@ public class Film {
     String description;
     LocalDate releaseDate;
     int duration;
+    private Set<Long> likes = new HashSet<>();
+
+    public Set<Long> getLikes() {
+        return likes;
+    }
 
     public int getDuration() {
         return duration;

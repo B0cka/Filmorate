@@ -14,17 +14,6 @@ class UserControllerTest {
     private UserController userController;
     private User validUser;
 
-    @BeforeEach
-    void setUp() {
-        userController = new UserController();
-
-        validUser = new User();
-        validUser.setEmail("test@example.com");
-        validUser.setLogin("testUser");
-        validUser.setName("Test");
-        validUser.setBirthday(LocalDate.parse("1990-01-01"));
-    }
-
     @Test
     void shouldCreateValidUser() {
         User createdUser = userController.create(validUser);

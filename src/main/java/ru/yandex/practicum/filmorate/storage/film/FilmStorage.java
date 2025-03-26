@@ -18,4 +18,6 @@ public interface FilmStorage {
 
     @GetMapping
     Collection<Film> getAll();
+
+    Film getById(Long id);
 }

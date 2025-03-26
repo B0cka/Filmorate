@@ -14,15 +14,6 @@ class FilmControllerTest {
     private FilmController filmController;
     private Film validFilm;
 
-    @BeforeEach
-    void setUp() {
-        filmController = new FilmController();
-        validFilm = new Film();
-        validFilm.setName("Inception");
-        validFilm.setDescription("A mind-bending thriller.");
-        validFilm.setReleaseDate(LocalDate.parse("2010-07-16"));
-        validFilm.setDuration(148);
-    }
 
     @Test
     void shouldNotCreateFilmWithTooLongDescription() {

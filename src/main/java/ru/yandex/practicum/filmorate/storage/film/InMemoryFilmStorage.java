@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -36,15 +37,18 @@ public class InMemoryFilmStorage implements FilmStorage {
     @PutMapping
     public Film update(@RequestBody Film newFilm) {
         log.info("Получен запрос на обновление фильма: {}", newFilm);
-
-        if (!films.containsKey(newFilm.getId())) {
-            log.warn("Ошибка: Фильм с id={} не найден", newFilm.getId());
-            throw new ValidationException("Фильм с id=" + newFilm.getId() + " не найден");
+        if (films.isEmpty()) {
+            throw new ValidationException("Пока что нет фильмов");
+        }
+        if (newFilm.getId() == 0 || !films.containsKey(newFilm.getId())) {
+            log.warn("Ошибка: фильм с id={} не найден", newFilm.getId());
+            throw new FilmNotFoundException("Фильм с id=" + newFilm.getId() + " не найден");
         }
 
         validateFilm(newFilm);
         films.put(newFilm.getId(), newFilm);
         log.info("Фильм обновлён: {}", newFilm);
+
         return newFilm;
     }
 
@@ -52,6 +56,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Collection<Film> getAll() {
         log.info("Запрос на получение всех фильмов");
         return films.values();
+    }
+
+
+    @Override
+    public Film getById(Long id) {
+
+        return films.get(id);
+    }
+
+    private long getNextId() {
+        return films.keySet().stream()
+                .mapToLong(id -> id)
+                .max()
+                .orElse(0) + 1;
     }
 
     private void validateFilm(Film film) {
@@ -71,12 +89,5 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.warn("Ошибка: Продолжительность фильма должна быть положительным числом");
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
-    }
-
-    private long getNextId() {
-        return films.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0) + 1;
     }
 }

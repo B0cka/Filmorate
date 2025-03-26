@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -17,9 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class InMemoryUserStorage implements UserStorage {
+public class inMemoryUserStorage implements UserStorage {
 
     private final Map<Long, User> users = new HashMap<>();
+    private long currentMaxId = 0;
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @PostMapping
@@ -27,6 +29,13 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(@RequestBody User user) {
         log.info("Получен запрос на создание пользователя: {}", user);
         validateUser(user);
+
+
+        if (users.containsKey(user.getId())) {
+            log.warn("Ошибка: Пользователь с id={} уже существует", user.getId());
+            throw new ValidationException("Пользователь с таким ID уже существует");
+        }
+
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.info("Пользователь создан: {}", user);
@@ -37,10 +46,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(@RequestBody User newUser) {
         log.info("Получен запрос на обновление пользователя: {}", newUser);
+        if (users.isEmpty()) {
+            throw new ValidationException("Пока что нет юзеров");
+        }
 
-        if (!users.containsKey(newUser.getId())) {
+        if (newUser.getId() == 0 || !users.containsKey(newUser.getId())) {
             log.warn("Ошибка: Пользователь с id={} не найден", newUser.getId());
-            throw new ValidationException("Пользователь с id=" + newUser.getId() + " не найден");
+            throw new UserNotFoundException("Пользователь с id=" + newUser.getId() + " не найден");
         }
 
         validateUser(newUser);
@@ -53,6 +65,10 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Collection<User> getAll() {
         log.info("Запрос на получение всех пользователей");
+        if (users.isEmpty()) {
+            throw new ValidationException("Пока что нет юзеров");
+        }
+
         return users.values();
     }
 
@@ -86,18 +102,13 @@ public class InMemoryUserStorage implements UserStorage {
     public User getById(Long id) {
         if (!users.containsKey(id)) {
             log.warn("Ошибка: Пользователь с id={} не найден", id);
-            throw new ValidationException("Пользователь с id=" + id + " не найден");
+            throw new UserNotFoundException("Пользователь с id=" + id + " не найден");
         }
         return users.get(id);
     }
 
     private long getNextId() {
-        return users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0) + 1;
+        currentMaxId++;
+        return currentMaxId;
     }
-
-
 }
