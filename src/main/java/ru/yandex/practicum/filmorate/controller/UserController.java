@@ -12,6 +12,7 @@ import java.util.Collection;
 public class UserController {
 
     final inMemoryUserStorage inMemoryUserStorage;
+
     @Autowired
     public UserController(inMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
