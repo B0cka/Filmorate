@@ -17,7 +17,7 @@ public class LikeController {
     final FilmService filmService;
 
     @Autowired
-    public LikeController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService){
+    public LikeController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
         this.filmService = filmService;
     }
