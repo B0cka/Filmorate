@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller.frieds_likes_controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.inMemoryUserStorage;
@@ -17,7 +16,7 @@ public class FriendController {
     final UserService filmService;
 
     @Autowired
-    public FriendController(inMemoryUserStorage inMemoryUserStorage, UserService userService){
+    public FriendController(inMemoryUserStorage inMemoryUserStorage, UserService userService) {
         this.inMemoryUserStorage = inMemoryUserStorage;
         this.filmService = userService;
     }
@@ -33,7 +32,7 @@ public class FriendController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend (@PathVariable Long id, @PathVariable Long friendId) {
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         filmService.addFriend(id, friendId);
     }
 
