@@ -14,7 +14,7 @@ public class FilmController {
     final InMemoryFilmStorage inMemoryFilmStorage;
 
     @Autowired
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage){
+    public FilmController(InMemoryFilmStorage inMemoryFilmStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
     }
 
