@@ -15,7 +15,9 @@ public class Film {
     LocalDate releaseDate;
     int duration;
     private Set<Long> likes = new HashSet<>();
+    private Set<Long> genres = new HashSet<>();
 
+    String mpaRatings;
     public Set<Long> getLikes() {
         return likes;
     }
@@ -58,5 +60,25 @@ public class Film {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public void setLikes(Set<Long> likes) {
+        this.likes = likes;
+    }
+
+    public Set<Long> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(Set<Long> genres) {
+        this.genres = genres;
+    }
+
+    public String getMpaRatings() {
+        return mpaRatings;
+    }
+
+    public void setMpaRatings(String mpa_ratings) {
+        this.mpaRatings = mpa_ratings;
     }
 }

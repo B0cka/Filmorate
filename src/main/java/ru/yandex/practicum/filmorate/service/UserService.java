@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -19,7 +20,7 @@ public class UserService {
     private final UserStorage userStorage;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage")UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
