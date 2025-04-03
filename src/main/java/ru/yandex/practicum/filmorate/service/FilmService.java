@@ -102,8 +102,11 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Название не может быть пустым");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             throw new ValidationException("Максимальная длина описания — 200 символов");
+        }
+        if (film.getReleaseDate() == null) {
+            throw new ValidationException("Дата релиза не может быть пустой");
         }
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
@@ -112,5 +115,6 @@ public class FilmService {
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
     }
+
 }
 
