@@ -1,18 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-public class Genre {
+public class MpaRating {
     private int id;
     private String name;
 
-    public Genre() {
+    public MpaRating() {
     }
 
-    public Genre(int id, String name) {
+    public MpaRating(int id) {
+        this.id = id;
+    }
+
+    public MpaRating(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 

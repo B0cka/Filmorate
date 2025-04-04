@@ -8,77 +8,26 @@ import java.util.Set;
 
 @Data
 public class Film {
-
-    long id;
-    String name;
-    String description;
-    LocalDate releaseDate;
-    int duration;
+    private long id;
+    private String name;
+    private String description;
+    private LocalDate releaseDate;
+    private int duration;
     private Set<Long> likes = new HashSet<>();
-    private Set<Long> genres = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
+    private MpaRating mpa;
 
-    String mpaRatings;
-    public Set<Long> getLikes() {
-        return likes;
+    public Film() {
     }
 
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration, MpaRating mpa, Set<Genre> genres) {
         this.id = id;
-    }
-
-    public void setLikes(Set<Long> likes) {
-        this.likes = likes;
-    }
-
-    public Set<Long> getGenres() {
-        return genres;
-    }
-
-    public void setGenres(Set<Long> genres) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
         this.genres = genres;
     }
 
-    public String getMpaRatings() {
-        return mpaRatings;
-    }
-
-    public void setMpaRatings(String mpa_ratings) {
-        this.mpaRatings = mpa_ratings;
-    }
 }

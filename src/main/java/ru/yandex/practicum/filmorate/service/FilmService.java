@@ -58,6 +58,11 @@ public class FilmService {
         return film;
     }
 
+    public void removeFilms(Long id){
+        log.info("Запрос на удаление  фильма c id={}", id);
+        filmStorage.removeFilms(id);
+    }
+
     public void addLike(Long filmId, Long userId) {
         log.info("Попытка добавить лайк: filmId={}, userId={}", filmId, userId);
 
@@ -81,10 +86,6 @@ public class FilmService {
     public void removeLike(Long filmId, Long userId) {
         log.info("Попытка удалить лайк: filmId={}, userId={}", filmId, userId);
         Film film = getById(filmId);
-
-        if (!film.getLikes().contains(userId)) {
-            throw new UserNotFoundException("Лайк от пользователя с id " + userId + " не найден");
-        }
 
         film.getLikes().remove(userId);
         log.info("Лайк удален: filmId={}, userId={}", filmId, userId);

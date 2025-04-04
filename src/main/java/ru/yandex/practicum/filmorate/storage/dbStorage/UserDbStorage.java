@@ -23,7 +23,6 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User create(User user) {
         String sql = "INSERT INTO users (id, name, email, birthday, login) VALUES (?, ?, ?, ?, ?)";
-
         try {
             jdbcTemplate.update(sql, user.getId(), user.getName(), user.getEmail(), user.getBirthday(), user.getLogin());
         } catch (Exception e) {
@@ -90,9 +89,10 @@ public class UserDbStorage implements UserStorage {
 
     public List<User> getFriends(Long userId) {
         String sql = "SELECT u.* FROM users u " +
-                "JOIN friendships f ON u.id = f.friend_id " +
-                "WHERE f.user_id = ? AND f.status = 'CONFIRMED'";
-        return jdbcTemplate.query(sql, this::mapRowToUser, userId);
+                "JOIN friendships f ON (u.id = f.friend_id OR u.id = f.user_id) " +
+                "WHERE (f.user_id = ? OR f.friend_id = ?) AND f.status = 'CONFIRMED'";
+        return jdbcTemplate.query(sql, this::mapRowToUser, userId, userId);
+
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
