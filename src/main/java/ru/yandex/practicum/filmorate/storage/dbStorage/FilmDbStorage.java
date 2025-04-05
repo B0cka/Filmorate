@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -42,9 +41,7 @@ public class FilmDbStorage implements FilmStorage {
         }, keyHolder);
 
         film.setId(keyHolder.getKey().longValue());
-
         saveGenres(film);
-
         return film;
     }
 
@@ -72,12 +69,15 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-
-
     @Override
     public List<Film> getAll() {
         String sql = "SELECT f.*, m.id as mpa_id, m.mpa_name FROM films f LEFT JOIN mpa_ratings m ON f.mpa_id = m.id";
-        return jdbcTemplate.query(sql, new FilmMapper());
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper());
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            film.setLikes(getLikesByFilmId(film.getId()));
+        }
+        return films;
     }
 
     @Override
@@ -99,6 +99,23 @@ public class FilmDbStorage implements FilmStorage {
         return new LinkedHashSet<>(jdbcTemplate.query(sql, (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), filmId));
     }
 
+    // Лайки
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        jdbcTemplate.update(sql, filmId, userId);
+    }
+
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
+        jdbcTemplate.update(sql, filmId, userId);
+    }
+
+    private Set<Long> getLikesByFilmId(Long filmId) {
+        String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
+        return new HashSet<>(jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"), filmId));
+    }
 
     public class FilmMapper implements RowMapper<Film> {
         @Override

@@ -1,6 +1,6 @@
 
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER  PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     birthday DATE NOT NULL,
@@ -11,15 +11,21 @@ CREATE TABLE IF NOT EXISTS mpa_ratings (
     id INTEGER PRIMARY KEY,
     mpa_name VARCHAR(50) NOT NULL UNIQUE
 );
-
 CREATE TABLE IF NOT EXISTS films (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT  PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     release_date DATE,
     duration INT,
     mpa_id INTEGER,
     FOREIGN KEY (mpa_id) REFERENCES mpa_ratings(id) ON DELETE SET NULL
+);
+CREATE TABLE IF NOT EXISTS film_likes (
+    film_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    PRIMARY KEY (film_id, user_id),
+    FOREIGN KEY (film_id) REFERENCES films(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS genres (

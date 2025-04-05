@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -66,30 +67,22 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         log.info("Попытка добавить лайк: filmId={}, userId={}", filmId, userId);
 
-        Film film = getById(filmId);
+        Film film = filmStorage.getById(filmId);
         User user = userStorage.getById(userId);
 
-        if (user == null) {
-            log.warn("Пользователь с id {} не найден", userId);
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден");
-        }
-
-        if (film.getLikes().contains(userId)) {
-            log.warn("Пользователь {} уже поставил лайк фильму {}", userId, filmId);
-            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
-        }
-
-        film.getLikes().add(userId);
+        filmStorage.addLike(filmId, userId);
         log.info("Лайк успешно добавлен: filmId={}, userId={}", filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         log.info("Попытка удалить лайк: filmId={}, userId={}", filmId, userId);
+
         Film film = getById(filmId);
 
-        film.getLikes().remove(userId);
-        log.info("Лайк удален: filmId={}, userId={}", filmId, userId);
+        filmStorage.removeLike(filmId, userId);
+        log.info("Лайк удалён: filmId={}, userId={}", filmId, userId);
     }
+
 
     public List<Film> getPopularFilms() {
         log.info("Запрос популярных фильмов");

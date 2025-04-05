@@ -3,10 +3,13 @@ package ru.yandex.practicum.filmorate.storage.dbStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,12 +25,21 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO users (id, name, email, birthday, login) VALUES (?, ?, ?, ?, ?)";
-        try {
-            jdbcTemplate.update(sql, user.getId(), user.getName(), user.getEmail(), user.getBirthday(), user.getLogin());
-        } catch (Exception e) {
-            System.err.println("Ошибка при добавлении пользователя: " + e.getMessage());
-            e.printStackTrace();
+        String sql = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            ps.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
+            return ps;
+        }, keyHolder);
+
+        Number key = keyHolder.getKey();
+        if (key != null) {
+            user.setId(key.longValue());
         }
 
         return user;
@@ -93,6 +105,18 @@ public class UserDbStorage implements UserStorage {
                 "WHERE (f.user_id = ? OR f.friend_id = ?) AND f.status = 'CONFIRMED'";
         return jdbcTemplate.query(sql, this::mapRowToUser, userId, userId);
 
+    }
+
+    public List<User> getCommonFriends(Long id, Long otherId) {
+        String sql = """
+        SELECT u.*
+        FROM users u
+        JOIN friendships f1 ON u.id = f1.friend_id
+        JOIN friendships f2 ON u.id = f2.friend_id
+        WHERE f1.user_id = ? AND f2.user_id = ? AND f1.status = 'CONFIRMED' AND f2.status = 'CONFIRMED'
+    """;
+
+        return jdbcTemplate.query(sql, this::mapRowToUser, id, otherId);
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
