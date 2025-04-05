@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(UserDbStorage.class)
-public class UserTest {
+public class userTest {
 
     @Autowired
     private UserDbStorage userStorage;
