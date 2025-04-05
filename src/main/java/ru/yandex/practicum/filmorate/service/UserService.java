@@ -43,9 +43,7 @@ public class UserService {
         if (user == null) {
             throw new UserNotFoundException("Пользователь с id " + id + " не найден");
         }
-        return user.getFriends().stream()
-                .map(userStorage::getById)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(id);
     }
 
     public void addFriend(Long id, Long friendId) {
@@ -64,11 +62,12 @@ public class UserService {
             throw new ValidationException("Нельзя добавить себя в друзья");
         }
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+        userStorage.sendFriendRequest(id, friendId);
+        userStorage.sendFriendRequest(friendId, id);
+        userStorage.confirmFriendRequest(id, friendId);
+
         log.info("Пользователи {} и {} теперь друзья", id, friendId);
     }
-
 
     public void removeFriend(Long id, Long friendId) {
         User user = userStorage.getById(id);
@@ -81,8 +80,7 @@ public class UserService {
         if (friend == null) {
             throw new NotFoundException("Friend not found");
         }
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+        userStorage.removeFriend(id, friendId);
     }
 
 
@@ -94,13 +92,7 @@ public class UserService {
             throw new UserNotFoundException("Один из пользователей не найден");
         }
 
-        Set<Long> commonFriends = user1.getFriends().stream()
-                .filter(user2.getFriends()::contains)
-                .collect(Collectors.toSet());
-
-        return commonFriends.stream()
-                .map(userStorage::getById)
-                .collect(Collectors.toList());
+        return userStorage.getCommonFriends(id, otherId);
     }
 
     public void validateUser(User user) {

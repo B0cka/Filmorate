@@ -3,9 +3,8 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 public interface UserStorage {
 
@@ -17,4 +16,13 @@ public interface UserStorage {
 
     User getById(Long id);
 
+    void sendFriendRequest(Long id, Long friendId);
+
+    void confirmFriendRequest(Long id, Long friendId);
+
+    void removeFriend(Long id, Long friendId);
+
+    List<User> getCommonFriends(Long id, Long otherId);
+
+    List<User> getFriends(Long id);
 }

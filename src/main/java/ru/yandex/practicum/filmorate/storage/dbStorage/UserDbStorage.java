@@ -82,7 +82,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-
+    @Override
     public void sendFriendRequest(Long userId, Long friendId) {
         User user = getById(userId);
         User friend = getById(friendId);
@@ -104,7 +104,7 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(sql, userId, friendId);
     }
 
-
+    @Override
     public void confirmFriendRequest(Long userId, Long friendId) {
         User user = getById(userId);
         User friend = getById(friendId);
