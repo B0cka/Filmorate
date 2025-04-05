@@ -1,4 +1,4 @@
-package userTests;
+package usertests;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(UserDbStorage.class)
-public class userTest {
+public class UserTest {
 
     @Autowired
     private UserDbStorage userStorage;
