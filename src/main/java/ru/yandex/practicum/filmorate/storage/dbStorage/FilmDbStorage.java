@@ -75,15 +75,16 @@ public class FilmDbStorage implements FilmStorage {
     private void saveGenres(Film film) {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-            Set<Long> genreIds = new HashSet<>();
-            for (var genre : film.getGenres()) {
-                genreIds.add(genre.getId());
-            }
-            for (Long genreId : genreIds) {
-                jdbcTemplate.update(sql, film.getId(), genreId);
+            Set<Long> seen = new HashSet<>();
+            for (Genre genre : film.getGenres()) {
+                if (seen.add(genre.getId())) {
+                    jdbcTemplate.update(sql, film.getId(), genre.getId());
+                }
             }
         }
     }
+
+
 
     @Override
     public Film update(Film film) {
