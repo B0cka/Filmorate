@@ -2,9 +2,11 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import org.slf4j.Logger;
@@ -121,13 +123,21 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
+    public void getByIdForVal(Long id) {
+        User user = userStorage.getById(id);
+        if (user == null) {
+            log.warn("User с id {} не найден", id);
+            throw new FilmNotFoundException("User с id " + id + " не найден");
+        }
 
+    }
     public User create(User user) {
         validateUser(user);
         return userStorage.create(user);
     }
 
     public User update(User user) {
+        getByIdForVal(user.getId());
         validateUser(user);
         return userStorage.update(user);
     }

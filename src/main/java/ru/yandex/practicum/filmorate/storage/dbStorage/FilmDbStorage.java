@@ -5,6 +5,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.MpaRatingNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MpaRating;
@@ -27,6 +29,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+                checkIfGenreExists(genre.getId());
+            }
+        }
+
+        checkIfMpaExists(film.getMpa().getId());
+
         String sql = "INSERT INTO films (name, description, release_date, duration, mpa_id) VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -43,6 +54,22 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(keyHolder.getKey().longValue());
         saveGenres(film);
         return film;
+    }
+
+    private void checkIfGenreExists(Long genreId) {
+        String sql = "SELECT COUNT(*) FROM genres WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, genreId);
+        if (count == null || count == 0) {
+            throw new GenreNotFoundException("Genre with id " + genreId + " not found.");
+        }
+    }
+
+    private void checkIfMpaExists(int mpaId) {
+        String sql = "SELECT COUNT(*) FROM mpa_ratings WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, mpaId);
+        if (count == null || count == 0) {
+            throw new MpaRatingNotFoundException("Mpa rating with id " + mpaId + " not found.");
+        }
     }
 
     private void saveGenres(Film film) {
@@ -101,16 +128,24 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms() {
-        String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, COUNT(fl.user_id) AS like_count " +
-                "FROM films f " +
-                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
-                "GROUP BY f.id " +
-                "ORDER BY like_count DESC " +
-                "LIMIT 10";
+        String sql = "SELECT f.id, \n" +
+                "       f.name, \n" +
+                "       f.description, \n" +
+                "       f.release_date, \n" +
+                "       f.duration, \n" +
+                "       f.mpa_id, \n" +
+                "       m.mpa_name, \n" +
+                "       COUNT(fl.user_id) AS like_count\n" +
+                "FROM films f\n" +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id\n" +
+                "LEFT JOIN mpa_ratings m ON f.mpa_id = m.id  -- Добавляем соединение с таблицей mpa_ratings\n" +
+                "GROUP BY f.id, m.mpa_name  -- Добавляем mpa_name в GROUP BY\n" +
+                "ORDER BY like_count DESC\n" +
+                "LIMIT 10;";
 
         List<Film> films = jdbcTemplate.query(sql, new FilmMapper());
 
-        // Добавляем жанры и лайки для каждого фильма
+
         for (Film film : films) {
             film.setGenres(getGenresByFilmId(film.getId()));
             film.setLikes(getLikesByFilmId(film.getId()));
@@ -118,7 +153,6 @@ public class FilmDbStorage implements FilmStorage {
 
         return films;
     }
-
 
     // Лайки
     @Override

@@ -84,15 +84,43 @@ public class UserDbStorage implements UserStorage {
 
 
     public void sendFriendRequest(Long userId, Long friendId) {
-        String sql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'PENDING')";
+        User user = getById(userId);
+        User friend = getById(friendId);
+
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с id=" + userId + " не найден!");
+        }
+        if (friend == null) {
+            throw new IllegalArgumentException("Пользователь с id=" + friendId + " не найден!");
+        }
+
+        String sql = "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, friendId);
+        if (count != null && count > 0) {
+            throw new IllegalStateException("Дружба уже существует!");
+        }
+
+        sql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'PENDING')";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
+
     public void confirmFriendRequest(Long userId, Long friendId) {
+        User user = getById(userId);
+        User friend = getById(friendId);
+
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с id=" + userId + " не найден!");
+        }
+        if (friend == null) {
+            throw new IllegalArgumentException("Пользователь с id=" + friendId + " не найден!");
+        }
+
         String sql = "UPDATE friendships SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(sql, friendId, userId);
         jdbcTemplate.update(sql, userId, friendId);
     }
+
 
     public void removeFriend(Long userId, Long friendId) {
         String sql = "DELETE FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";

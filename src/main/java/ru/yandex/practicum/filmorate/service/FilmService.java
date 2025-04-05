@@ -40,6 +40,7 @@ public class FilmService {
 
     public Film update(Film film) {
         validateFilm(film);
+        getByIdForVal(film.getId());
         log.info("Обновление фильма: {}", film);
         return filmStorage.update(film);
     }
@@ -90,7 +91,17 @@ public class FilmService {
 
     }
 
+    public void getByIdForVal(Long id) {
+        Film film = filmStorage.getById(id);
+        if (film == null) {
+            log.warn("Фильм с id {} не найден", id);
+            throw new FilmNotFoundException("Фильм с id " + id + " не найден");
+        }
+
+    }
+
     private void validateFilm(Film film) {
+
         if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Название не может быть пустым");
         }
