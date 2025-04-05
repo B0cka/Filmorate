@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 public interface FilmStorage {
@@ -20,5 +21,6 @@ public interface FilmStorage {
 
     void addLike(Long filmId, Long userId);
     void removeLike(Long filmId, Long userId);
+    public List<Film> getPopularFilms();
 
 }

@@ -86,10 +86,8 @@ public class FilmService {
 
     public List<Film> getPopularFilms() {
         log.info("Запрос популярных фильмов");
-        return filmStorage.getAll().stream()
-                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
-                .limit(10)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms();
+
     }
 
     private void validateFilm(Film film) {

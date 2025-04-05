@@ -99,6 +99,27 @@ public class FilmDbStorage implements FilmStorage {
         return new LinkedHashSet<>(jdbcTemplate.query(sql, (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")), filmId));
     }
 
+    @Override
+    public List<Film> getPopularFilms() {
+        String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, COUNT(fl.user_id) AS like_count " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "GROUP BY f.id " +
+                "ORDER BY like_count DESC " +
+                "LIMIT 10";
+
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper());
+
+        // Добавляем жанры и лайки для каждого фильма
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            film.setLikes(getLikesByFilmId(film.getId()));
+        }
+
+        return films;
+    }
+
+
     // Лайки
     @Override
     public void addLike(Long filmId, Long userId) {
