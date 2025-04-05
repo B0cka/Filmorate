@@ -22,6 +22,10 @@ public class User {
         this.birthday = birthday;
     }
 
+    public User() {
+
+    }
+
     private Set<Long> friends = new HashSet<>();
 
     public Set<Long> getFriends() {
