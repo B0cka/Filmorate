@@ -27,13 +27,13 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Genre getGenreById(Long id){
+    public Genre getGenreById(Long id) {
         String sql = "SELECT * FROM genres WHERE id = ?";
-    try {
-        return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
-    } catch (EmptyResultDataAccessException e){
-        throw new EntityNotFoundException("Жанр с ID " + id + " не найден");
-    }
+        try {
+            return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFoundException("Жанр с ID " + id + " не найден");
+        }
 
     }
 

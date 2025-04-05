@@ -57,7 +57,7 @@ public class FilmService {
         return film;
     }
 
-    public void removeFilms(Long id){
+    public void removeFilms(Long id) {
         log.info("Запрос на удаление  фильма c id={}", id);
         filmStorage.removeFilms(id);
     }

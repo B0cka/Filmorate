@@ -31,7 +31,7 @@ public class MpaDbStorage implements MpaStorage {
         String sql = "SELECT * FROM mpa_ratings WHERE id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, new MpaMapper(), id);
-        } catch (EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new EntityNotFoundException("Жанр с ID " + id + " не найден");
         }
     }
