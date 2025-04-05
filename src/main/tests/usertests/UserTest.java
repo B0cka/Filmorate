@@ -46,6 +46,7 @@ public class UserTest {
                     assertThat(u.getBirthday()).isEqualTo(LocalDate.of(1990, 1, 1));
                 });
     }
+
     @Test
     public void testUpdateUser() {
         User user = new User();
@@ -101,7 +102,7 @@ public class UserTest {
 
         assertThat(friends)
                 .isNotEmpty()
-                .anyMatch(f -> f.getId() == friendId );
+                .anyMatch(f -> f.getId() == friendId);
     }
 
     @Test
@@ -150,19 +151,18 @@ public class UserTest {
         User createdFriend = userStorage.create(friend);
         Long friendId = createdFriend.getId();
 
-        User friend_2 = new User();
-        friend_2.setEmail("friend@example.com.dot1");
-        friend_2.setLogin("testFriend5451");
-        friend_2.setName("Test Friend7771");
-        friend_2.setBirthday(LocalDate.of(1990, 11, 1));
-        User createdFriend_2 = userStorage.create(friend_2);
-        Long friend_2_Id = createdFriend_2.getId();
-
+        User friend2 = new User();  // Исправлено имя переменной
+        friend2.setEmail("friend@example.com.dot1");
+        friend2.setLogin("testFriend5451");
+        friend2.setName("Test Friend7771");
+        friend2.setBirthday(LocalDate.of(1990, 11, 1));
+        User createdFriend2 = userStorage.create(friend2);  // Исправлено имя переменной
+        Long friend2Id = createdFriend2.getId();  // Исправлено имя переменной
 
         userStorage.sendFriendRequest(friendId, userId);
-        userStorage.sendFriendRequest(friend_2_Id, userId);
+        userStorage.sendFriendRequest(friend2Id, userId);  // Исправлено имя переменной
 
-        List<User> friends = userStorage.getCommonFriends(friendId, friend_2_Id);
+        List<User> friends = userStorage.getCommonFriends(friendId, friend2Id);  // Исправлено имя переменной
         assertThat(friends)
                 .isNotEmpty();
     }
