@@ -37,9 +37,8 @@ public class UserDbStorage implements UserStorage {
             return ps;
         }, keyHolder);
 
-        Number key = keyHolder.getKey();
-        if (key != null) {
-            user.setId(key.longValue());
+        if (keyHolder.getKey() != null) {
+            user.setId(keyHolder.getKey().longValue());
         }
 
         return user;
@@ -51,99 +50,57 @@ public class UserDbStorage implements UserStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
         } catch (EmptyResultDataAccessException e) {
-            System.err.println("Пользователь с id=" + id + " не найден!");
             return null;
         }
     }
 
-
     @Override
     public List<User> getAll() {
-        String sql = "SELECT * FROM users";
-        return jdbcTemplate.query(sql, this::mapRowToUser);
+        return jdbcTemplate.query("SELECT * FROM users", this::mapRowToUser);
     }
 
     @Override
     public User update(User user) {
         String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE id = ?";
-
-        try {
-            int updatedRows = jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-
-            if (updatedRows == 0) {
-                throw new RuntimeException("Пользователь с id=" + user.getId() + " не найден!");
-            }
-
-            return getById(user.getId());
-        } catch (Exception e) {
-            System.err.println("Ошибка при обновлении пользователя: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
+        return getById(user.getId());
     }
 
     @Override
     public void sendFriendRequest(Long userId, Long friendId) {
-        User user = getById(userId);
-        User friend = getById(friendId);
+        String checkSql = "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, friendId);
 
-        if (user == null) {
-            throw new IllegalArgumentException("Пользователь с id=" + userId + " не найден!");
+        if (count != null && count == 0) {
+            String insertSql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
+            jdbcTemplate.update(insertSql, userId, friendId);
         }
-        if (friend == null) {
-            throw new IllegalArgumentException("Пользователь с id=" + friendId + " не найден!");
-        }
-
-        String sql = "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, friendId);
-        if (count != null && count > 0) {
-            throw new IllegalStateException("Дружба уже существует!");
-        }
-
-        sql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'PENDING')";
-        jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
-    public void confirmFriendRequest(Long userId, Long friendId) {
-        User user = getById(userId);
-        User friend = getById(friendId);
-
-        if (user == null) {
-            throw new IllegalArgumentException("Пользователь с id=" + userId + " не найден!");
-        }
-        if (friend == null) {
-            throw new IllegalArgumentException("Пользователь с id=" + friendId + " не найден!");
-        }
-
-        String sql = "UPDATE friendships SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sql, friendId, userId);
+    public void removeFriend(Long userId, Long friendId) {
+        String sql = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
 
-    public void removeFriend(Long userId, Long friendId) {
-        String sql = "DELETE FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)";
-        jdbcTemplate.update(sql, userId, friendId, friendId, userId);
-    }
-
+    @Override
     public List<User> getFriends(Long userId) {
         String sql = "SELECT u.* FROM users u " +
-                "JOIN friendships f ON (u.id = f.friend_id OR u.id = f.user_id) " +
-                "WHERE (f.user_id = ? OR f.friend_id = ?) AND f.status = 'CONFIRMED'";
-        return jdbcTemplate.query(sql, this::mapRowToUser, userId, userId);
-
+                "JOIN friendships f ON u.id = f.friend_id " +
+                "WHERE f.user_id = ? AND f.status = 'CONFIRMED'";
+        return jdbcTemplate.query(sql, this::mapRowToUser, userId);
     }
 
+    @Override
     public List<User> getCommonFriends(Long id, Long otherId) {
         String sql = """
-        SELECT u.*
-        FROM users u
-        JOIN friendships f1 ON u.id = f1.friend_id
-        JOIN friendships f2 ON u.id = f2.friend_id
-        WHERE f1.user_id = ? AND f2.user_id = ? AND f1.status = 'CONFIRMED' AND f2.status = 'CONFIRMED'
-    """;
-
+            SELECT u.*
+            FROM users u
+            JOIN friendships f1 ON u.id = f1.friend_id
+            JOIN friendships f2 ON u.id = f2.friend_id
+            WHERE f1.user_id = ? AND f2.user_id = ? AND f1.status = 'CONFIRMED' AND f2.status = 'CONFIRMED'
+        """;
         return jdbcTemplate.query(sql, this::mapRowToUser, id, otherId);
     }
 

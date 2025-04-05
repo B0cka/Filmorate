@@ -18,8 +18,6 @@ public interface UserStorage {
 
     void sendFriendRequest(Long id, Long friendId);
 
-    void confirmFriendRequest(Long id, Long friendId);
-
     void removeFriend(Long id, Long friendId);
 
     List<User> getCommonFriends(Long id, Long otherId);

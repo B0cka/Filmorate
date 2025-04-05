@@ -1,3 +1,4 @@
+// UserService.java
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -6,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import org.slf4j.Logger;
@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -23,7 +21,7 @@ public class UserService {
     private final UserStorage userStorage;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(@Qualifier("userDbStorage")UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -31,67 +29,38 @@ public class UserService {
         log.info("Запрос пользователя с id={}", id);
         User user = userStorage.getById(id);
         if (user == null) {
-            log.warn("Пользователь с id={} не найден", id);
             throw new UserNotFoundException("Пользователь с id " + id + " не найден");
         }
-        log.info("Пользователь найден: {}", user);
         return user;
     }
 
     public List<User> getFriends(Long id) {
-        User user = userStorage.getById(id);
-        if (user == null) {
-            throw new UserNotFoundException("Пользователь с id " + id + " не найден");
-        }
+        getUserById(id);
         return userStorage.getFriends(id);
     }
 
     public void addFriend(Long id, Long friendId) {
         log.info("Попытка добавить в друзья: userId={}, friendId={}", id, friendId);
-
-        User user = userStorage.getById(id);
-        User friend = userStorage.getById(friendId);
-
-        if (user == null || friend == null) {
-            log.warn("Один из пользователей не найден: userId={}, friendId={}", id, friendId);
-            throw new UserNotFoundException("Один из пользователей не найден");
-        }
-
         if (id.equals(friendId)) {
-            log.warn("Пользователь {} пытается добавить себя в друзья", id);
             throw new ValidationException("Нельзя добавить себя в друзья");
         }
 
-        userStorage.sendFriendRequest(id, friendId);
-        userStorage.sendFriendRequest(friendId, id);
-        userStorage.confirmFriendRequest(id, friendId);
+        getUserById(id);
+        getUserById(friendId);
 
-        log.info("Пользователи {} и {} теперь друзья", id, friendId);
+        userStorage.sendFriendRequest(id, friendId);
+        log.info("Пользователь {} отправил запрос в друзья пользователю {}", id, friendId);
     }
 
     public void removeFriend(Long id, Long friendId) {
-        User user = userStorage.getById(id);
-        User friend = userStorage.getById(friendId);
-
-        if (user == null) {
-            throw new NotFoundException("User not found");
-        }
-
-        if (friend == null) {
-            throw new NotFoundException("Friend not found");
-        }
+        getUserById(id);
+        getUserById(friendId);
         userStorage.removeFriend(id, friendId);
     }
 
-
     public List<User> getCommonFriends(Long id, Long otherId) {
-        User user1 = userStorage.getById(id);
-        User user2 = userStorage.getById(otherId);
-
-        if (user1 == null || user2 == null) {
-            throw new UserNotFoundException("Один из пользователей не найден");
-        }
-
+        getUserById(id);
+        getUserById(otherId);
         return userStorage.getCommonFriends(id, otherId);
     }
 
@@ -115,14 +84,13 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
+
     public void getByIdForVal(Long id) {
-        User user = userStorage.getById(id);
-        if (user == null) {
-            log.warn("User с id {} не найден", id);
+        if (userStorage.getById(id) == null) {
             throw new FilmNotFoundException("User с id " + id + " не найден");
         }
-
     }
+
     public User create(User user) {
         validateUser(user);
         return userStorage.create(user);
