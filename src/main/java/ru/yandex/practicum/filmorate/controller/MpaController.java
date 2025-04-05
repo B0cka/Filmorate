@@ -24,7 +24,7 @@ public class MpaController {
     }
 
     @GetMapping("/{id}")
-    public MpaRating getById(@PathVariable int id){
+    public MpaRating getById(@PathVariable int id) {
         return mpaStorage.getById(id);
     }
 }
