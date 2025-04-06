@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
