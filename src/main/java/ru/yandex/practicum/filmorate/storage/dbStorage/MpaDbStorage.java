@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -32,7 +31,7 @@ public class MpaDbStorage implements MpaStorage {
         try {
             return jdbcTemplate.queryForObject(sql, new MpaMapper(), id);
         } catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException("Жанр с ID " + id + " не найден");
+            return null;
         }
     }
 

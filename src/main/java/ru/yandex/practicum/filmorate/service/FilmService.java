@@ -5,10 +5,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.MpaRatingNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.film.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
@@ -20,17 +25,23 @@ public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage) {
+                       @Qualifier("userDbStorage") UserStorage userStorage,
+                       GenreStorage genreStorage, MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
-    }
+        this.genreStorage = genreStorage;
+        this.mpaStorage = mpaStorage;
 
+    }
 
     public Film create(Film film) {
         validateFilm(film);
+        validateGenreAndMpaExistence(film);
         log.info("Создание фильма: {}", film);
         return filmStorage.create(film);
     }
@@ -38,8 +49,23 @@ public class FilmService {
     public Film update(Film film) {
         validateFilm(film);
         getByIdForVal(film.getId());
+        validateGenreAndMpaExistence(film);
         log.info("Обновление фильма: {}", film);
         return filmStorage.update(film);
+    }
+
+    private void validateGenreAndMpaExistence(Film film) {
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+
+                if (genreStorage.getGenreById(genre.getId()) == null) {
+                    throw new GenreNotFoundException("Genre with id " + genre.getId() + " not found.");
+                }
+            }
+        }
+        if (mpaStorage.getById(film.getMpa().getId()) == null) {
+            throw new MpaRatingNotFoundException("Mpa rating with id " + film.getMpa().getId() + " not found.");
+        }
     }
 
     public Collection<Film> getAll() {

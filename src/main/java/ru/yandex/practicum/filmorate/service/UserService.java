@@ -86,7 +86,7 @@ public class UserService {
 
     public void getByIdForVal(Long id) {
         if (userStorage.getById(id) == null) {
-            throw new FilmNotFoundException("User с id " + id + " не найден");
+            throw new UserNotFoundException("User с id " + id + " не найден");
         }
     }
 

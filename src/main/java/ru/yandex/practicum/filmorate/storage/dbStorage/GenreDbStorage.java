@@ -32,7 +32,7 @@ public class GenreDbStorage implements GenreStorage {
         try {
             return jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
         } catch (EmptyResultDataAccessException e) {
-            throw new EntityNotFoundException("Жанр с ID " + id + " не найден");
+            return null;
         }
 
     }
