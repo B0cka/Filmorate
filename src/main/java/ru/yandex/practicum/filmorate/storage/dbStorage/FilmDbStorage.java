@@ -131,11 +131,11 @@ public class FilmDbStorage implements FilmStorage {
 
     private Set<Genre> getGenresByFilmId(Long filmId) {
         String sql = """
-    SELECT g.id, g.name 
-    FROM genres g 
-    JOIN film_genres fg ON g.id = fg.genre_id 
-    WHERE fg.film_id = ?
-""";
+                    SELECT g.id, g.name 
+                    FROM genres g 
+                    JOIN film_genres fg ON g.id = fg.genre_id 
+                    WHERE fg.film_id = ?
+                """;
         return new LinkedHashSet<>(jdbcTemplate.query(sql,
                 (rs, rowNum) -> new Genre(rs.getInt("id"), rs.getString("name")),
                 filmId));
