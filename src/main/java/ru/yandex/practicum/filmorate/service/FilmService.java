@@ -2,42 +2,70 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.exception.MpaRatingNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.film.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage,
+                       GenreStorage genreStorage, MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.genreStorage = genreStorage;
+        this.mpaStorage = mpaStorage;
+
     }
 
     public Film create(Film film) {
         validateFilm(film);
+        validateGenreAndMpaExistence(film);
         log.info("Создание фильма: {}", film);
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
         validateFilm(film);
+        getByIdForVal(film.getId());
+        validateGenreAndMpaExistence(film);
         log.info("Обновление фильма: {}", film);
         return filmStorage.update(film);
+    }
+
+    private void validateGenreAndMpaExistence(Film film) {
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            for (Genre genre : film.getGenres()) {
+
+                if (genreStorage.getGenreById(genre.getId()) == null) {
+                    throw new GenreNotFoundException("Genre with id " + genre.getId() + " not found.");
+                }
+            }
+        }
+        if (mpaStorage.getById(film.getMpa().getId()) == null) {
+            throw new MpaRatingNotFoundException("Mpa rating with id " + film.getMpa().getId() + " not found.");
+        }
     }
 
     public Collection<Film> getAll() {
@@ -55,52 +83,56 @@ public class FilmService {
         return film;
     }
 
+    public void removeFilms(Long id) {
+        log.info("Запрос на удаление  фильма c id={}", id);
+        filmStorage.removeFilms(id);
+    }
+
     public void addLike(Long filmId, Long userId) {
         log.info("Попытка добавить лайк: filmId={}, userId={}", filmId, userId);
 
-        Film film = getById(filmId);
+        Film film = filmStorage.getById(filmId);
         User user = userStorage.getById(userId);
 
-        if (user == null) {
-            log.warn("Пользователь с id {} не найден", userId);
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден");
-        }
-
-        if (film.getLikes().contains(userId)) {
-            log.warn("Пользователь {} уже поставил лайк фильму {}", userId, filmId);
-            throw new ValidationException("Пользователь уже поставил лайк этому фильму");
-        }
-
-        film.getLikes().add(userId);
+        filmStorage.addLike(filmId, userId);
         log.info("Лайк успешно добавлен: filmId={}, userId={}", filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         log.info("Попытка удалить лайк: filmId={}, userId={}", filmId, userId);
+
         Film film = getById(filmId);
 
-        if (!film.getLikes().contains(userId)) {
-            throw new UserNotFoundException("Лайк от пользователя с id " + userId + " не найден");
-        }
-
-        film.getLikes().remove(userId);
-        log.info("Лайк удален: filmId={}, userId={}", filmId, userId);
+        filmStorage.removeLike(filmId, userId);
+        log.info("Лайк удалён: filmId={}, userId={}", filmId, userId);
     }
+
 
     public List<Film> getPopularFilms() {
         log.info("Запрос популярных фильмов");
-        return filmStorage.getAll().stream()
-                .sorted((f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()))
-                .limit(10)
-                .collect(Collectors.toList());
+        return filmStorage.getPopularFilms();
+
+    }
+
+    public void getByIdForVal(Long id) {
+        Film film = filmStorage.getById(id);
+        if (film == null) {
+            log.warn("Фильм с id {} не найден", id);
+            throw new FilmNotFoundException("Фильм с id " + id + " не найден");
+        }
+
     }
 
     private void validateFilm(Film film) {
+
         if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Название не может быть пустым");
         }
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             throw new ValidationException("Максимальная длина описания — 200 символов");
+        }
+        if (film.getReleaseDate() == null) {
+            throw new ValidationException("Дата релиза не может быть пустой");
         }
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
             throw new ValidationException("Дата релиза — не раньше 28 декабря 1895 года");
@@ -109,5 +141,6 @@ public class FilmService {
             throw new ValidationException("Продолжительность фильма должна быть положительным числом");
         }
     }
+
 }
 

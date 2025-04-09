@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
-
 import java.util.Collection;
 import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -24,6 +24,11 @@ public class FilmController {
     @PutMapping
     public Film update(@RequestBody Film newFilm) {
         return filmService.update(newFilm);
+    }
+
+    @DeleteMapping("/{id}")
+    public void removeFilms(@PathVariable Long id) {
+        filmService.removeFilms(id);
     }
 
     @GetMapping
