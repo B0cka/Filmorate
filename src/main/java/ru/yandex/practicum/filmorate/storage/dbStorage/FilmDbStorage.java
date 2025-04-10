@@ -82,12 +82,6 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void removeFilms(Long id) {
-        String sql = "DELETE FROM films WHERE id = ?";
-        jdbcTemplate.update(sql, id);
-    }
-
-    @Override
     public List<Film> getPopularFilms() {
         String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, COUNT(fl.user_id) AS like_count " +
                 "FROM films f " +
@@ -115,6 +109,12 @@ public class FilmDbStorage implements FilmStorage {
     public void removeLike(Long filmId, Long userId) {
         String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
         jdbcTemplate.update(sql, filmId, userId);
+    }
+
+    @Override
+    public boolean deleteFilm(Long id) {
+        String sql = "DELETE FROM films WHERE id = ?";
+        return jdbcTemplate.update(sql, id) > 0;
     }
 
     private void saveGenres(Film film) {
