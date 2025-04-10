@@ -88,22 +88,36 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms() {
+    public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
+
         String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, COUNT(fl.user_id) AS like_count " +
                 "FROM films f " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
                 "LEFT JOIN mpa_ratings m ON f.mpa_id = m.id " +
+                "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.id " +
+                "WHERE (? IS NULL OR g.id = ?) " +
+                "AND (? IS NULL OR EXTRACT(YEAR FROM f.release_date) = ?) " +
                 "GROUP BY f.id, m.mpa_name " +
                 "ORDER BY like_count DESC " +
-                "LIMIT 10";
+                "LIMIT ?";
 
-        List<Film> films = jdbcTemplate.query(sql, new FilmMapper());
+
+        List<Film> films = jdbcTemplate.query(
+                sql,
+                new FilmMapper(),
+                genreId, genreId, year, year, count
+        );
+
+
         for (Film film : films) {
             film.setGenres(getGenresByFilmId(film.getId()));
             film.setLikes(getLikesByFilmId(film.getId()));
         }
+
         return films;
     }
+
 
     @Override
     public void addLike(Long filmId, Long userId) {
