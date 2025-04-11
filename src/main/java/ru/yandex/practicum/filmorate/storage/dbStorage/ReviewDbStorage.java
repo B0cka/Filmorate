@@ -48,6 +48,9 @@ public class ReviewDbStorage implements ReviewStorage {
     @Override
     public Review updateReview(@RequestBody Review review) {
         String sql = "UPDATE reviews SET user_id = ?, content = ?, useful = ?, is_positive = ? WHERE review_id = ?";
+        if (review.getUseful() == null) {
+            review.setUseful(0);
+        }
         jdbcTemplate.update(sql,
                 review.getUserId(),
                 review.getContent(),
@@ -68,6 +71,78 @@ public class ReviewDbStorage implements ReviewStorage {
     public void deleteReview(Long id) {
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql, id);
+    }
+
+    @Override
+    public void addLike(Long reviewId, Long userId) {
+        String checkSql = "SELECT is_like FROM review_likes WHERE review_id = ? AND user_id = ?";
+        List<Boolean> result = jdbcTemplate.query(checkSql,
+                (rs, rowNum) -> rs.getBoolean("is_like"),
+                reviewId, userId);
+
+        if (!result.isEmpty()) {
+            boolean isCurrentlyLike = result.get(0);
+            if (!isCurrentlyLike) {
+                String updateSql = "UPDATE review_likes SET is_like = true WHERE review_id = ? AND user_id = ?";
+                jdbcTemplate.update(updateSql, reviewId, userId);
+                updateUseful(reviewId, 2);
+            }
+        } else {
+            String insertSql = "INSERT INTO review_likes (review_id, user_id, is_like) VALUES (?, ?, true)";
+            jdbcTemplate.update(insertSql, reviewId, userId);
+            updateUseful(reviewId, 1);
+        }
+    }
+
+
+
+    @Override
+    public void addDislike(Long reviewId, Long userId) {
+        String checkSql = "SELECT is_like FROM review_likes WHERE review_id = ? AND user_id = ?";
+        List<Boolean> result = jdbcTemplate.query(checkSql,
+                (rs, rowNum) -> rs.getBoolean("is_like"),
+                reviewId, userId);
+
+        if (!result.isEmpty()) {
+            boolean isCurrentlyLike = result.get(0);
+            if (isCurrentlyLike) {
+
+                String updateSql = "UPDATE review_likes SET is_like = false WHERE review_id = ? AND user_id = ?";
+                jdbcTemplate.update(updateSql, reviewId, userId);
+                updateUseful(reviewId, -2);
+            }
+
+        } else {
+
+            String insertSql = "INSERT INTO review_likes (review_id, user_id, is_like) VALUES (?, ?, false)";
+            jdbcTemplate.update(insertSql, reviewId, userId);
+            updateUseful(reviewId, -1);
+        }
+    }
+
+
+
+    @Override
+    public void removeLike(Long reviewId, Long userId) {
+        String sql = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_like = true";
+        int rows = jdbcTemplate.update(sql, reviewId, userId);
+        if (rows > 0) {
+            updateUseful(reviewId, -1);
+        }
+    }
+
+    @Override
+    public void removeDislike(Long reviewId, Long userId) {
+        String sql = "DELETE FROM review_likes WHERE review_id = ? AND user_id = ? AND is_like = false";
+        int rows = jdbcTemplate.update(sql, reviewId, userId);
+        if (rows > 0) {
+            updateUseful(reviewId, 1);
+        }
+    }
+
+    private void updateUseful(Long reviewId, int num) {
+        String sql = "UPDATE reviews SET useful = useful + ? WHERE review_id = ?";
+        jdbcTemplate.update(sql, num, reviewId);
     }
 
     @Override

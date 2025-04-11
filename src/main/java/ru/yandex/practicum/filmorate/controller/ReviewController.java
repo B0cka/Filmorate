@@ -45,7 +45,6 @@ public class ReviewController {
         return reviewStorage.getReviews(filmId, count);
     }
 
-    /*
     @PutMapping("/{id}/like/{userId}")
     public void like(@PathVariable Long id, @PathVariable Long userId) {
         reviewStorage.addLike(id, userId);
@@ -66,6 +65,5 @@ public class ReviewController {
         reviewStorage.removeDislike(id, userId);
     }
 
-     */
 }
 

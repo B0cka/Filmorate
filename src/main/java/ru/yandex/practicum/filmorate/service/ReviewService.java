@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +42,6 @@ public class ReviewService {
         return review;
     }
 
-
     public void deleteReview(Long id) {
         reviewStorage.deleteReview(id);
     }
@@ -50,9 +50,29 @@ public class ReviewService {
         return reviewStorage.getReviews(filmId, count);
     }
 
+    public void addLike(Long reviewId, Long userId) {
+        reviewStorage.addLike(reviewId, userId);
+        log.info("Пользователь {} лайкнул отзыв {}", userId, reviewId);
+    }
+
+    public void createDislike(Long reviewId, Long userId){
+        reviewStorage.addDislike(reviewId, userId);
+        log.info("Пользователь {} дизлайкнул отзыв {}", userId, reviewId);
+    }
+
+    public void removeLike(Long reviewId, Long userId){
+        reviewStorage.removeLike(reviewId, userId);
+        log.info("Пользователь {} удалил лайк {}", userId, reviewId);
+    }
+
+    public void removeDislike(Long reviewId, Long userId){
+        reviewStorage.removeDislike(reviewId, userId);
+        log.info("Пользователь {} удалил дизлайк {}", userId, reviewId);
+    }
+
     private void validateReview(Review review) {
         if (review.getUserId() == null || review.getUserId() <= 0) {
-            throw new IllegalArgumentException("Некорректный userId: " + review.getUserId());
+            throw new UserNotFoundException("Некорректный userId: " + review.getUserId());
         }
         if (review.getFilmId() == null || review.getFilmId() <= 0) {
             throw new IllegalArgumentException("Некорректный filmId: " + review.getFilmId());
