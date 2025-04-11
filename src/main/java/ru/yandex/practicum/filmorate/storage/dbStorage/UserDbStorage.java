@@ -105,7 +105,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public boolean deleteUser(Long id) {
+    public boolean removeUser(Long id) {
         String sql = """
                 DELETE FROM users
                 WHERE id = ?

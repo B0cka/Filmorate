@@ -22,6 +22,6 @@ public interface FilmStorage {
 
     public List<Film> getPopularFilms();
 
-    boolean deleteFilm(Long id);
+    boolean removeFilm(Long id);
 
 }

@@ -105,8 +105,8 @@ public class UserService {
         return userStorage.getAll();
     }
 
-    public void deleteUser(Long id) {
-        if (!userStorage.deleteUser(id)) {
+    public void removeUser(Long id) {
+        if (!userStorage.removeUser(id)) {
             log.error("Ошибка удаления пользователя id {}", id);
             throw new FilmNotFoundException("Пользователь с id " + id + " не найден");
         }
