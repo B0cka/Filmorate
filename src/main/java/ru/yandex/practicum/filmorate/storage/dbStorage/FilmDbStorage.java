@@ -81,15 +81,9 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    @Override
-    public void removeFilms(Long id) {
-        String sql = "DELETE FROM films WHERE id = ?";
-        jdbcTemplate.update(sql, id);
-    }
 
     @Override
     public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
-
         String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, COUNT(fl.user_id) AS like_count " +
                 "FROM films f " +
                 "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
@@ -131,6 +125,12 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(sql, filmId, userId);
     }
 
+    @Override
+    public boolean removeFilm(Long id) {
+        String sql = "DELETE FROM films WHERE id = ?";
+        return jdbcTemplate.update(sql, id) > 0;
+    }
+
     private void saveGenres(Film film) {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
@@ -143,7 +143,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Set<Genre> getGenresByFilmId(Long filmId) {
+    private LinkedHashSet<Genre> getGenresByFilmId(Long filmId) {
         String sql = """
                     SELECT g.id, g.name
                     FROM genres g
@@ -170,7 +170,7 @@ public class FilmDbStorage implements FilmStorage {
                     rs.getDate("release_date").toLocalDate(),
                     rs.getInt("duration"),
                     new MpaRating(rs.getInt("mpa_id"), rs.getString("mpa_name")),
-                    new HashSet<>()
+                    new LinkedHashSet<>()
             );
         }
     }

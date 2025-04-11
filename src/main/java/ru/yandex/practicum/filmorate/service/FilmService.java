@@ -83,11 +83,6 @@ public class FilmService {
         return film;
     }
 
-    public void removeFilms(Long id) {
-        log.info("Запрос на удаление  фильма c id={}", id);
-        filmStorage.removeFilms(id);
-    }
-
     public void addLike(Long filmId, Long userId) {
         log.info("Попытка добавить лайк: filmId={}, userId={}", filmId, userId);
 
@@ -126,6 +121,14 @@ public class FilmService {
             throw new FilmNotFoundException("Фильм с id " + id + " не найден");
         }
 
+    }
+
+    public void removeFilm(Long id) {
+        if (!filmStorage.removeFilm(id)) {
+            log.error("Ошибка удаления фильма id {}", id);
+            throw new FilmNotFoundException("Фильм с id " + id + " не найден");
+        }
+        log.info("Фильм с id {} удалён", id);
     }
 
     private void validateFilm(Film film) {
