@@ -143,7 +143,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private Set<Genre> getGenresByFilmId(Long filmId) {
+    private LinkedHashSet<Genre> getGenresByFilmId(Long filmId) {
         String sql = """
                     SELECT g.id, g.name
                     FROM genres g
@@ -170,7 +170,7 @@ public class FilmDbStorage implements FilmStorage {
                     rs.getDate("release_date").toLocalDate(),
                     rs.getInt("duration"),
                     new MpaRating(rs.getInt("mpa_id"), rs.getString("mpa_name")),
-                    new HashSet<>()
+                    new LinkedHashSet<>()
             );
         }
     }
