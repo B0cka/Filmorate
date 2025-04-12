@@ -81,8 +81,8 @@ public class ReviewDbStorage implements ReviewStorage {
                 reviewId, userId);
 
         if (!result.isEmpty()) {
-            boolean isCurrentlyLike = result.get(0);
-            if (!isCurrentlyLike) {
+            boolean isLike = result.get(0);
+            if (!isLike) {
                 String updateSql = "UPDATE review_likes SET is_like = true WHERE review_id = ? AND user_id = ?";
                 jdbcTemplate.update(updateSql, reviewId, userId);
                 updateUseful(reviewId, 2);
@@ -95,7 +95,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
 
-
     @Override
     public void addDislike(Long reviewId, Long userId) {
         String checkSql = "SELECT is_like FROM review_likes WHERE review_id = ? AND user_id = ?";
@@ -104,23 +103,18 @@ public class ReviewDbStorage implements ReviewStorage {
                 reviewId, userId);
 
         if (!result.isEmpty()) {
-            boolean isCurrentlyLike = result.get(0);
-            if (isCurrentlyLike) {
-
+            boolean isLike = result.get(0);
+            if (isLike) {
                 String updateSql = "UPDATE review_likes SET is_like = false WHERE review_id = ? AND user_id = ?";
                 jdbcTemplate.update(updateSql, reviewId, userId);
                 updateUseful(reviewId, -2);
             }
-
         } else {
-
             String insertSql = "INSERT INTO review_likes (review_id, user_id, is_like) VALUES (?, ?, false)";
             jdbcTemplate.update(insertSql, reviewId, userId);
             updateUseful(reviewId, -1);
         }
     }
-
-
 
     @Override
     public void removeLike(Long reviewId, Long userId) {
