@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.MpaRatingNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.film.MpaStorage;
@@ -19,6 +18,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class FilmService {
@@ -91,8 +91,8 @@ public class FilmService {
     public void addLike(Long filmId, Long userId) {
         log.info("Попытка добавить лайк: filmId={}, userId={}", filmId, userId);
 
-        Film film = filmStorage.getById(filmId);
-        User user = userStorage.getById(userId);
+        filmStorage.getById(filmId);
+        userStorage.getById(userId);
 
         filmStorage.addLike(filmId, userId);
         log.info("Лайк успешно добавлен: filmId={}, userId={}", filmId, userId);
@@ -101,14 +101,14 @@ public class FilmService {
     public void removeLike(Long filmId, Long userId) {
         log.info("Попытка удалить лайк: filmId={}, userId={}", filmId, userId);
 
-        Film film = getById(filmId);
+        getById(filmId);
 
         filmStorage.removeLike(filmId, userId);
         log.info("Лайк удалён: filmId={}, userId={}", filmId, userId);
     }
 
 
-    public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
+    public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
         if (count <= 0) {
             throw new ValidationException("Количество фильмов должно быть больше 0");
         }
@@ -126,6 +126,17 @@ public class FilmService {
             throw new FilmNotFoundException("Фильм с id " + id + " не найден");
         }
 
+    }
+
+    public Collection<Film> searchFilms(String query, Set<String> by) {
+        if (query == null || query.isEmpty()) {
+            return getAll();
+        }
+        if (by.isEmpty() || by.size() > 2 || !Set.of("title", "director").containsAll(by)) {
+            throw new ValidationException("Параметр by может принимать значение title, director или оба");
+        }
+        log.info("Запрос на поиск фильма: query={}, by={}", query, by);
+        return filmStorage.searchFilmsByQuery(query, by);
     }
 
     private void validateFilm(Film film) {

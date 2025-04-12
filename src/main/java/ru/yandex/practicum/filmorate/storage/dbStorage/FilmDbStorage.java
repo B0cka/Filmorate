@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -88,7 +90,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
+    public List<Film> getPopularFilms(int count, Integer genreId, Integer year) {
 
         String sql = "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id, m.mpa_name, COUNT(fl.user_id) AS like_count " +
                 "FROM films f " +
@@ -118,6 +120,36 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public Collection<Film> searchFilmsByQuery(String query, Set<String> by) {
+        StringBuilder sqlBuilder = new StringBuilder("SELECT f.id, f.name, f.description, f.release_date, f.duration, " +
+                "f.mpa_id, m.mpa_name, COUNT(fl.user_id) AS like_count " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON f.id = fl.film_id " +
+                "LEFT JOIN mpa_ratings m ON f.mpa_id = m.id " +
+                "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                "LEFT JOIN genres g ON fg.genre_id = g.id "
+        );
+
+        List<String> conditions = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
+        String search = "%" + query.toLowerCase() + "%";
+
+        if (by.contains("title")) {
+            conditions.add("LOWER(f.name) LIKE ?");
+            params.add(search);
+        }
+
+        sqlBuilder.append(" WHERE ").append(String.join(" AND ", conditions));
+        sqlBuilder.append(" GROUP BY f.id, m.mpa_name ORDER BY like_count DESC");
+
+        return jdbcTemplate.query(
+                sqlBuilder.toString(),
+                new FilmMapper(),
+                params.toArray()
+        );
+    }
+
 
     @Override
     public void addLike(Long filmId, Long userId) {
@@ -134,7 +166,7 @@ public class FilmDbStorage implements FilmStorage {
     private void saveGenres(Film film) {
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-            Set<Long> seen = new HashSet<>();
+            Set<Integer> seen = new HashSet<>();
             for (Genre genre : film.getGenres()) {
                 if (seen.add(genre.getId())) {
                     jdbcTemplate.update(sql, film.getId(), genre.getId());
@@ -169,8 +201,9 @@ public class FilmDbStorage implements FilmStorage {
                     rs.getString("description"),
                     rs.getDate("release_date").toLocalDate(),
                     rs.getInt("duration"),
-                    new MpaRating(rs.getInt("mpa_id"), rs.getString("mpa_name")),
-                    new HashSet<>()
+                    new HashSet<>(),
+                    new HashSet<>(),
+                    new MpaRating(rs.getInt("mpa_id"), rs.getString("mpa_name"))
             );
         }
     }
