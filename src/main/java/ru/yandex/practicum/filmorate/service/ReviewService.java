@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -50,11 +51,12 @@ public class ReviewService {
         if (id < 0) {
             throw new IllegalArgumentException("Некорректный ID");
         }
-        Review review = reviewStorage.getById(id);
-        if (review == null) {
-            throw new ReviewNotFoundException("Отзыв с ID " + id + " не найден");
+
+        try {
+            return reviewStorage.getById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Отзыв с ID " + id + " не найден");
         }
-        return review;
     }
 
     public void deleteReview(Long id) {

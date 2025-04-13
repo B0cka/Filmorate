@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class ReviewDbStorage implements ReviewStorage {
@@ -39,7 +41,6 @@ public class ReviewDbStorage implements ReviewStorage {
             return ps;
         }, keyHolder);
 
-
         review.setReviewId(keyHolder.getKey().longValue());
 
         return review;
@@ -61,11 +62,16 @@ public class ReviewDbStorage implements ReviewStorage {
         return review;
     }
 
-    @Override
     public Review getById(Long id) {
         String sql = "SELECT * FROM reviews WHERE review_id = ?";
-        return jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+        try {
+            return jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+        }
     }
+
+
 
     @Override
     public void deleteReview(Long id) {
@@ -93,7 +99,6 @@ public class ReviewDbStorage implements ReviewStorage {
             updateUseful(reviewId, 1);
         }
     }
-
 
     @Override
     public void addDislike(Long reviewId, Long userId) {
