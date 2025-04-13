@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Slf4j
 @Service
@@ -75,27 +75,27 @@ public class ReviewService {
         log.info("Пользователь {} лайкнул отзыв {}", userId, reviewId);
     }
 
-    public void createDislike(Long reviewId, Long userId){
+    public void createDislike(Long reviewId, Long userId) {
         reviewStorage.addDislike(reviewId, userId);
         log.info("Пользователь {} дизлайкнул отзыв {}", userId, reviewId);
     }
 
-    public void removeLike(Long reviewId, Long userId){
+    public void removeLike(Long reviewId, Long userId) {
         reviewStorage.removeLike(reviewId, userId);
         log.info("Пользователь {} удалил лайк {}", userId, reviewId);
     }
 
-    public void removeDislike(Long reviewId, Long userId){
+    public void removeDislike(Long reviewId, Long userId) {
         reviewStorage.removeDislike(reviewId, userId);
         log.info("Пользователь {} удалил дизлайк {}", userId, reviewId);
     }
 
     private void validateReview(Review review) {
 
-        if(userStorage.getById(review.getUserId()) == null){
+        if (userStorage.getById(review.getUserId()) == null) {
             throw new UserNotFoundException("Юзера с Id не существует!: " + review.getUserId());
         }
-        if(filmStorage.getById(review.getFilmId()) == null){
+        if (filmStorage.getById(review.getFilmId()) == null) {
             throw new FilmNotFoundException("film с Id не существует!: " + review.getFilmId());
         }
         if (review.getFilmId() == null || review.getFilmId() <= 0) {
