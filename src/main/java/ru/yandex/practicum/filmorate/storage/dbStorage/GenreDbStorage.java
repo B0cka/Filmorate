@@ -33,7 +33,6 @@ public class GenreDbStorage implements GenreStorage {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
-
     }
 
     public static class GenreMapper implements RowMapper<Genre> {
@@ -45,6 +44,4 @@ public class GenreDbStorage implements GenreStorage {
             return genre;
         }
     }
-
-
 }
