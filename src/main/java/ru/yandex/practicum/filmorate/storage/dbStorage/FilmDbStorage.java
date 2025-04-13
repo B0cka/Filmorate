@@ -143,6 +143,14 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT COUNT(*) FROM films WHERE film_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
+
     private Set<Genre> getGenresByFilmId(Long filmId) {
         String sql = """
                     SELECT g.id, g.name

@@ -25,4 +25,5 @@ public interface UserStorage {
     List<User> getFriends(Long id);
 
     public boolean existsById(long id);
+
 }

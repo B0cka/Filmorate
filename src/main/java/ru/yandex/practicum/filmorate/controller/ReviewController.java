@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
@@ -19,8 +21,14 @@ public class ReviewController {
 
     @PostMapping()
     public Review createReview(@RequestBody Review review){
-        return reviewStorage.createReview(review);
+        if(review.getUserId() < 0 || review.getFilmId() < 0){
+            throw  new UserNotFoundException("Неверные данные");
+        } else {
+            return reviewStorage.createReview(review);
+        }
+
     }
+
 
     @PutMapping()
     public Review updateReview(@RequestBody Review review){
@@ -34,7 +42,8 @@ public class ReviewController {
 
     @GetMapping("/{id}")
     public Optional<Review> getById(@PathVariable Long id) {
-        return Optional.ofNullable(reviewStorage.getById(id));
+        return Optional.ofNullable(reviewStorage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + id + " не найден")));
     }
 
     @GetMapping

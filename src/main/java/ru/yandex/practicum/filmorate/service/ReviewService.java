@@ -1,13 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ReviewNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
@@ -15,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,12 +29,19 @@ public class ReviewService {
     }
 
     public Review createReview(Review review) {
-        if (!userStorage.existsById(review.getUserId())) {
+
+                if (!userStorage.existsById(review.getUserId())) {
             throw new UserNotFoundException("Пользователь с id=" + review.getUserId() + " не найден");
         }
 
+        if (!filmStorage.existsById(review.getFilmId())) {
+            throw new FilmNotFoundException("Фильм с id=" + review.getFilmId() + " не найден");
+        }
+
+
         validateReview(review);
         log.info("Создан отзыв: {}", review);
+
         return reviewStorage.createReview(review);
     }
 
@@ -52,12 +57,10 @@ public class ReviewService {
             throw new IllegalArgumentException("Некорректный ID");
         }
 
-        try {
-            return reviewStorage.getById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Отзыв с ID " + id + " не найден");
-        }
+        return reviewStorage.getById(id)
+                .orElseThrow(() -> new NotFoundException("Отзыв с ID " + id + " не найден"));
     }
+
 
     public void deleteReview(Long id) {
         reviewStorage.deleteReview(id);

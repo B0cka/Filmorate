@@ -62,15 +62,16 @@ public class ReviewDbStorage implements ReviewStorage {
         return review;
     }
 
-    public Review getById(Long id) {
+    @Override
+    public Optional<Review> getById(Long id) {
         String sql = "SELECT * FROM reviews WHERE review_id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+            Review review = jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+            return Optional.ofNullable(review);
         } catch (EmptyResultDataAccessException e) {
-            return jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
+            return Optional.empty();
         }
     }
-
 
 
     @Override
