@@ -20,8 +20,8 @@ public class ReviewController {
     }
 
     @PostMapping()
-    public Review createReview(@RequestBody Review review){
-        if(review.getUserId() < 0 || review.getFilmId() < 0){
+    public Review createReview(@RequestBody Review review) {
+        if (review.getUserId() < 0 || review.getFilmId() < 0) {
             throw  new UserNotFoundException("Неверные данные");
         } else {
             return reviewStorage.createReview(review);
@@ -29,14 +29,13 @@ public class ReviewController {
 
     }
 
-
     @PutMapping()
-    public Review updateReview(@RequestBody Review review){
+    public Review updateReview(@RequestBody Review review) {
         return reviewStorage.updateReview(review);
     }
 
     @DeleteMapping("/{id}")
-    void deleteReview(@PathVariable Long id){
+    void deleteReview(@PathVariable Long id) {
         reviewStorage.deleteReview(id);
     }
 
