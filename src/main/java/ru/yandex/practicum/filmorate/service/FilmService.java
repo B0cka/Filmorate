@@ -114,10 +114,15 @@ public class FilmService {
         log.info("Лайк удалён: filmId={}, userId={}", filmId, userId);
     }
 
+    public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
+        if (count <= 0) {
+            throw new ValidationException("Количество фильмов должно быть больше 0");
+        }
+        if (genreId != null && genreStorage.getGenreById(genreId) == null) {
+            throw new GenreNotFoundException("Жанр с id " + genreId + " не найден");
+        }
 
-    public List<Film> getPopularFilms() {
-        log.info("Запрос популярных фильмов");
-        return filmStorage.getPopularFilms();
+        return filmStorage.getPopularFilms(count, genreId, year);
     }
 
     public void getByIdForVal(Long id) {
