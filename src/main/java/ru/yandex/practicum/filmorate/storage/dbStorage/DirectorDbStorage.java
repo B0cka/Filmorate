@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.storage.film.DirectorStorage;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
