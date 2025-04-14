@@ -79,6 +79,7 @@ public class ReviewService {
         log.info("Пользователь {} удалил дизлайк {}", userId, reviewId);
     }
 
+
     private void validateReview(Review review) {
 
         if (userStorage.getById(review.getUserId()) == null) {
