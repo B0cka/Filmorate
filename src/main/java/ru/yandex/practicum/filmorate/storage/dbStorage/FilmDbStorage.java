@@ -72,7 +72,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String genresSql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
-            Set<Long> seenGenres = new HashSet<>();
+            Set<Integer> seenGenres = new HashSet<>();
             for (Genre genre : film.getGenres()) {
                 if (seenGenres.add(genre.getId())) {
                     jdbcTemplate.update(genresSql, film.getId(), genre.getId());
@@ -289,11 +289,11 @@ public class FilmDbStorage implements FilmStorage {
 
             for (Director director : film.getDirectors()) {
                 if (director != null) {
-                    boolean exists = jdbcTemplate.queryForObject(
+                    boolean exists = Boolean.TRUE.equals(jdbcTemplate.queryForObject(
                             "SELECT EXISTS(SELECT 1 FROM directors WHERE director_id = ?)",
                             Boolean.class,
                             director.getId()
-                    );
+                    ));
                     if (!exists) {
                         throw new NotFoundException("Режиссер с id " + director.getId() + " не найден");
                     }
