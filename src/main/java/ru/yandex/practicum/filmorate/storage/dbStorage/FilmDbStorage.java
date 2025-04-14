@@ -118,11 +118,11 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film getById(Long id) {
         String sql = """
-    SELECT f.*, m.id AS mpa_id, m.mpa_name
-    FROM films f
-    LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
-    WHERE f.id = ?
-    """;
+                SELECT f.*, m.id AS mpa_id, m.mpa_name
+                FROM films f
+                LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
+                WHERE f.id = ?
+                """;
 
         try {
             Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
@@ -185,13 +185,15 @@ public class FilmDbStorage implements FilmStorage {
     public boolean removeFilm(Long id) {
         String sql = "DELETE FROM films WHERE id = ?";
         return jdbcTemplate.update(sql, id) > 0;
+    }
+
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         String sql = """
-        SELECT f.*, m.id AS mpa_id, m.mpa_name
-        FROM films f
-        INNER JOIN film_directors fd ON f.id = fd.film_id
-        LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
-        WHERE fd.director_id = ?""";
+                SELECT f.*, m.id AS mpa_id, m.mpa_name
+                FROM films f
+                INNER JOIN film_directors fd ON f.id = fd.film_id
+                LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
+                WHERE fd.director_id = ?""";
 
         if ("year".equals(sortBy)) {
             sql += " ORDER BY f.release_date";
@@ -221,7 +223,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-   
+
     @Override
     public boolean existsById(Long id) {
         String sql = "SELECT COUNT(*) FROM films WHERE film_id = ?";
@@ -296,3 +298,4 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 }
+
