@@ -17,13 +17,12 @@ public class Film {
     private LocalDate releaseDate;
     private int duration;
     private Set<Long> likes = new HashSet<>();
-    private Set<Genre> genres = new HashSet<>();
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     private MpaRating mpa;
     private Set<Director> directors;
 
 
-    public Film(long id, String name, String description, LocalDate releaseDate,
-              int duration, MpaRating mpa, Set<Genre> genres, Set<Director> directors) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration, MpaRating mpa, LinkedHashSet<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;

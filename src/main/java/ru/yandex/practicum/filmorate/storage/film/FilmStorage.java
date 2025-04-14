@@ -18,13 +18,13 @@ public interface FilmStorage {
 
     Film getById(Long id);
 
-    void removeFilms(Long id);
-
     void addLike(Long filmId, Long userId);
 
     void removeLike(Long filmId, Long userId);
 
     List<Film> getPopularFilms(int count, Long genreId, Integer year);
+
+    boolean removeFilm(Long id);
 
     boolean existsById(Long id);
 
