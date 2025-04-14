@@ -121,7 +121,8 @@ public class FilmDbStorage implements FilmStorage {
     SELECT f.*, m.id AS mpa_id, m.mpa_name
     FROM films f
     LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
-    WHERE f.id = ?""";
+    WHERE f.id = ?
+    """;
 
         try {
             Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
@@ -221,6 +222,13 @@ public class FilmDbStorage implements FilmStorage {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean existsById(Long id) {
+        String sql = "SELECT COUNT(*) FROM films WHERE film_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
     }
 
     private Set<Genre> getGenresByFilmId(Long filmId) {
