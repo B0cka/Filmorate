@@ -48,7 +48,7 @@ class FilmTest {
 
     @AfterEach
     void clear() {
-        filmDbStorage.removeFilms(film.getId());
+        filmDbStorage.removeFilm(film.getId());
     }
 
     @Test
