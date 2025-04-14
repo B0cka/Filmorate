@@ -13,6 +13,8 @@ public interface FilmStorage {
 
     Film update(Film newFilm);
 
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
+
     Collection<Film> getAll();
 
     Film getById(Long id);

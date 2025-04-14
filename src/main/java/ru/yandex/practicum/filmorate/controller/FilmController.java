@@ -5,6 +5,7 @@ import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -61,6 +62,14 @@ public class FilmController {
     @GetMapping("/search")
     public Collection<Film> searchFilms(@RequestParam String query, @RequestParam() Set<String> by) {
         return filmService.searchFilms(query, by);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getFilmsByDirector(@PathVariable Long directorId, @RequestParam String sortBy) {
+        if (!"year".equals(sortBy) && !"likes".equals(sortBy)) {
+            throw new ValidationException("Параметр sortBy должен быть year или likes");
+        }
+        return filmService.getFilmsByDirector(directorId, sortBy);
     }
 }
 
