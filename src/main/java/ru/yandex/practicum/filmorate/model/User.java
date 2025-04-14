@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-
 public class User {
     private long id;
     private String email;
@@ -23,7 +22,6 @@ public class User {
     }
 
     public User() {
-
     }
 
     private Set<Long> friends = new HashSet<>();

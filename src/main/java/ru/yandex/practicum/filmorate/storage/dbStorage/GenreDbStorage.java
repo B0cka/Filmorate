@@ -33,10 +33,9 @@ public class GenreDbStorage implements GenreStorage {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
-
     }
 
-    public class GenreMapper implements RowMapper<Genre> {
+    public static class GenreMapper implements RowMapper<Genre> {
         @Override
         public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
             Genre genre = new Genre();
@@ -45,6 +44,4 @@ public class GenreDbStorage implements GenreStorage {
             return genre;
         }
     }
-
-
 }
