@@ -230,7 +230,6 @@ public class FilmDbStorage implements FilmStorage {
         return count != null && count > 0;
     }
 
-
     private Set<Genre> getGenresByFilmId(Long filmId) {
         String sql = """
                     SELECT g.id, g.name

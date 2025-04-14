@@ -22,23 +22,13 @@ public class ReviewService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
-    public ReviewService(@Qualifier("reviewDbStorage") ReviewStorage reviewStorage, @Qualifier("userDbStorage")UserStorage userStorage,@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public ReviewService(@Qualifier("reviewDbStorage") ReviewStorage reviewStorage, @Qualifier("userDbStorage") UserStorage userStorage, @Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.reviewStorage = reviewStorage;
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
     }
 
     public Review createReview(Review review) {
-
-                if (!userStorage.existsById(review.getUserId())) {
-            throw new UserNotFoundException("Пользователь с id=" + review.getUserId() + " не найден");
-        }
-
-        if (!filmStorage.existsById(review.getFilmId())) {
-            throw new FilmNotFoundException("Фильм с id=" + review.getFilmId() + " не найден");
-        }
-
-
         validateReview(review);
         log.info("Создан отзыв: {}", review);
 

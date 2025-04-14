@@ -1,8 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Review {
 
     private Long reviewId;
@@ -12,15 +16,4 @@ public class Review {
     private Boolean isPositive;
     private Integer useful;
 
-    public Review(Long reviewId, Long userId, Long filmId, String content, Boolean isPositive, Integer useful) {
-        this.reviewId = reviewId;
-        this.userId = userId;
-        this.filmId = filmId;
-        this.content = content;
-        this.isPositive = isPositive;
-        this.useful = useful;
-    }
-
-    public Review() {
-    }
 }
