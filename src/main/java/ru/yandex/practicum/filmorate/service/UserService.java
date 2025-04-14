@@ -89,6 +89,10 @@ public class UserService {
         }
     }
 
+    public boolean existsById(long id) {
+        return userStorage.existsById(id);
+    }
+
     public User create(User user) {
         validateUser(user);
         return userStorage.create(user);
@@ -102,5 +106,13 @@ public class UserService {
 
     public Collection<User> getAll() {
         return userStorage.getAll();
+    }
+
+    public void removeUser(Long id) {
+        if (!userStorage.removeUser(id)) {
+            log.error("Ошибка удаления пользователя id {}", id);
+            throw new UserNotFoundException("Пользователь с id " + id + " не найден");
+        }
+        log.info("Пользователь с id {} удалён", id);
     }
 }

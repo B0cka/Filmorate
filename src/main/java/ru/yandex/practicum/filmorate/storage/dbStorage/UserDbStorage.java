@@ -55,6 +55,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public boolean existsById(long id) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
+
+    @Override
     public List<User> getAll() {
         return jdbcTemplate.query("SELECT * FROM users", this::mapRowToUser);
     }
@@ -102,6 +110,15 @@ public class UserDbStorage implements UserStorage {
                     WHERE f1.user_id = ? AND f2.user_id = ? AND f1.status = 'CONFIRMED' AND f2.status = 'CONFIRMED'
                 """;
         return jdbcTemplate.query(sql, this::mapRowToUser, id, otherId);
+    }
+
+    @Override
+    public boolean removeUser(Long id) {
+        String sql = """
+                DELETE FROM users
+                WHERE id = ?
+                """;
+        return jdbcTemplate.update(sql, id) > 0;
     }
 
     private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {

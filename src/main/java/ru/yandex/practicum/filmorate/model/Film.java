@@ -19,7 +19,7 @@ public class Film {
     private LocalDate releaseDate;
     private Integer duration;
     private Set<Long> likes = new HashSet<>();
-    private Set<Genre> genres = new LinkedHashSet<>();
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     private MpaRating mpa;
     private Set<Director> directors = new HashSet<>();
 }
