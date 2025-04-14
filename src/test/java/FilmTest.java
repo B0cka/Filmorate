@@ -32,6 +32,8 @@ class FilmTest {
 
     private Film film;
 
+    private Director director;
+
     @BeforeEach
     void init() {
         film = new Film();
@@ -44,11 +46,13 @@ class FilmTest {
         mpa.setName("G");
         film.setMpa(mpa);
         film = filmDbStorage.create(film);
+        director = directorDbStorage.createDirector(new Director("Quentin Tarantino", null));
     }
 
     @AfterEach
     void clear() {
         filmDbStorage.removeFilm(film.getId());
+        directorDbStorage.deleteDirector(director.getId());
     }
 
     @Test
@@ -103,11 +107,19 @@ class FilmTest {
 
     @Test
     void testSearchFilmByDirector() {
-        Director director = directorDbStorage.createDirector(new Director("Quentin Tarantino", null));
         film.setDirectors(Set.of(director));
         film.setName("Reservoir Dogs");
         filmDbStorage.update(film);
         Collection<Film> searchedFilms = filmDbStorage.searchFilmsByQuery("ntin Tarant", Set.of("director"));
+        assertThat(searchedFilms).contains(film);
+
+    }
+
+    @Test
+    void testSearchFilmByDirectorAndTitle() {
+        film.setDirectors(Set.of(director));
+        filmDbStorage.update(film);
+        Collection<Film> searchedFilms = filmDbStorage.searchFilmsByQuery("st F", Set.of("title", "director"));
         assertThat(searchedFilms).contains(film);
     }
 }

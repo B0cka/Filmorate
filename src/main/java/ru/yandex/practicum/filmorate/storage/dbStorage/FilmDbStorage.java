@@ -186,7 +186,7 @@ public class FilmDbStorage implements FilmStorage {
             params.add(search);
         }
 
-        sqlBuilder.append(" WHERE ").append(String.join(" AND ", conditions));
+        sqlBuilder.append(" WHERE ").append(String.join(" OR ", conditions));
         sqlBuilder.append(" GROUP BY f.id, m.mpa_name ORDER BY like_count DESC");
 
         List<Film> films = jdbcTemplate.query(
