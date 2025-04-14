@@ -8,5 +8,5 @@ public interface MpaStorage {
 
     List<MpaRating> getAllMpa();
 
-    public MpaRating getById(int id);
+    MpaRating getById(int id);
 }

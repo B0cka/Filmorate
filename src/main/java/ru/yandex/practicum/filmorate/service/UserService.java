@@ -90,6 +90,10 @@ public class UserService {
         }
     }
 
+    public boolean existsById(long id) {
+        return userStorage.existsById(id);
+    }
+
     public User create(User user) {
         validateUser(user);
         return userStorage.create(user);
