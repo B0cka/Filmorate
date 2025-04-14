@@ -136,11 +136,11 @@ public class FilmService {
     }
 
     public Collection<Film> searchFilms(String query, Set<String> by) {
-        if (query == null || query.isEmpty()) {
-            return getAll();
-        }
         if (by.isEmpty() || by.size() > 2 || !Set.of("title", "director").containsAll(by)) {
             throw new ValidationException("Параметр by может принимать значение title, director или оба");
+        }
+        if (query == null || query.isEmpty()) {
+            return getAll();
         }
         log.info("Запрос на поиск фильма: query={}, by={}", query, by);
         return filmStorage.searchFilmsByQuery(query, by);

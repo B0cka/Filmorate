@@ -6,8 +6,10 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.FilmorateApplication;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.storage.dbStorage.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
 
 import java.time.LocalDate;
@@ -19,11 +21,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import(FilmDbStorage.class)
+@Import({FilmDbStorage.class, DirectorDbStorage.class})
 class FilmTest {
 
     @Autowired
     private FilmDbStorage filmDbStorage;
+
+    @Autowired
+    private DirectorDbStorage directorDbStorage;
 
     private Film film;
 
@@ -93,6 +98,16 @@ class FilmTest {
     @Test
     void testSearchFilmByTitle() {
         Collection<Film> searchedFilms = filmDbStorage.searchFilmsByQuery("st F", Set.of("title"));
+        assertThat(searchedFilms).contains(film);
+    }
+
+    @Test
+    void testSearchFilmByDirector() {
+        Director director = directorDbStorage.createDirector(new Director("Quentin Tarantino", null));
+        film.setDirectors(Set.of(director));
+        film.setName("Reservoir Dogs");
+        filmDbStorage.update(film);
+        Collection<Film> searchedFilms = filmDbStorage.searchFilmsByQuery("ntin Tarant", Set.of("director"));
         assertThat(searchedFilms).contains(film);
     }
 }
