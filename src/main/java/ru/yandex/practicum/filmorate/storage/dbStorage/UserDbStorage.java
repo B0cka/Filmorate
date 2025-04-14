@@ -55,6 +55,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    public boolean existsById(long id) {
+        String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
+
+    @Override
     public List<User> getAll() {
         return jdbcTemplate.query("SELECT * FROM users", this::mapRowToUser);
     }

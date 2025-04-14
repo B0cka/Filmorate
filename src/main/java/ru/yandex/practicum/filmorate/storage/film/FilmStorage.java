@@ -12,6 +12,8 @@ public interface FilmStorage {
 
     Film update(Film newFilm);
 
+    List<Film> getFilmsByDirector(Long directorId, String sortBy);
+
     Collection<Film> getAll();
 
     Film getById(Long id);
@@ -23,5 +25,7 @@ public interface FilmStorage {
     List<Film> getPopularFilms(int count, Long genreId, Integer year);
 
     boolean removeFilm(Long id);
+
+    boolean existsById(Long id);
 
 }
