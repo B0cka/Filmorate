@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -10,18 +11,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+import static ru.yandex.practicum.filmorate.model.FeedEventType.REVIEW;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.ADD;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.UPDATE;
+
 @Repository
+@RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final FeedDbStorage feedStorage;
 
     @Override
     public Review createReview(Review review) {
@@ -42,7 +48,7 @@ public class ReviewDbStorage implements ReviewStorage {
         }, keyHolder);
 
         review.setReviewId(keyHolder.getKey().longValue());
-
+        feedStorage.save(REVIEW, ADD, review.getReviewId(), review.getUserId());
         return review;
     }
 
@@ -59,6 +65,7 @@ public class ReviewDbStorage implements ReviewStorage {
                 review.getIsPositive(),
                 review.getReviewId()
         );
+        feedStorage.save(REVIEW, UPDATE, review.getReviewId(), review.getUserId());
         return review;
     }
 

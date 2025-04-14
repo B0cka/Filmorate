@@ -22,7 +22,7 @@ public class GenreService {
     public Genre getGenreById(Integer id) {
         Genre genre = genreStorage.getGenreById(id);
         if (genre == null) {
-            throw new GenreNotFoundException("Жанр с id " + id + " не найден");
+            throw new GenreNotFoundException(id);
         }
         return genre;
     }
