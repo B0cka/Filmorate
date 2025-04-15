@@ -120,6 +120,12 @@ public class FilmService {
         return filmStorage.getPopularFilms(count, genreId, year);
     }
 
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        checkUserId(userId);
+        checkUserId(friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
     public void getByIdForVal(Long id) {
         Film film = filmStorage.getById(id);
         if (film == null) {
@@ -157,6 +163,12 @@ public class FilmService {
     public List<Film> getFilmsByDirector(Long directorId, String sortBy) {
         checkDirectorIdOrThrow(directorId);
         return filmStorage.getFilmsByDirector(directorId, sortBy);
+    }
+
+    private void checkUserId(Long userId) {
+        if (userStorage.getById(userId) == null) {
+            throw new NotFoundException("Пользователь с id + " + userId + " не найден");
+        }
     }
 
     private void checkDirectorIdOrThrow(Long id) {

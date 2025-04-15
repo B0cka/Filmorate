@@ -137,6 +137,26 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        String sql = """
+                SELECT f.*, m.mpa_name AS mpa_name, m.id AS mpa_id
+                FROM films AS f
+                JOIN film_likes AS fl ON fl.film_id = f.id
+                JOIN mpa_ratings m ON f.mpa_id = m.id
+                WHERE f.id IN (
+                    SELECT fl1.film_id
+                    FROM film_likes fl1
+                    JOIN film_likes fl2 ON fl1.film_id = fl2.film_id
+                    WHERE fl1.user_id = ? AND fl2.user_id = ?
+                )
+                GROUP BY f.id, m.mpa_name, m.id
+                ORDER BY COUNT(fl.user_id) DESC;
+                """;
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
+        films.forEach(f -> f.setLikes(getLikesByFilmId(f.getId())));
+        return films;
+    }
 
     @Override
     public List<Film> getPopularFilms(int count, Long genreId, Integer year) {
@@ -158,7 +178,6 @@ public class FilmDbStorage implements FilmStorage {
                 new FilmMapper(),
                 genreId, genreId, year, year, count
         );
-
 
         for (Film film : films) {
             film.setGenres(getGenresByFilmId(film.getId()));
@@ -222,7 +241,6 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
     }
-
 
     @Override
     public boolean existsById(Long id) {
