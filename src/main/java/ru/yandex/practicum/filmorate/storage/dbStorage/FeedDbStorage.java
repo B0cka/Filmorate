@@ -75,7 +75,7 @@ public class FeedDbStorage implements FeedStorage {
     private FeedRecord mapRowToFeedRecord(ResultSet rs, int rowNum) throws SQLException {
         return new FeedRecord(
                 rs.getLong("event_id"),
-                rs.getTimestamp("timestamp").toLocalDateTime(),
+                rs.getTimestamp("timestamp").getTime(),
                 FeedEventType.valueOf(rs.getString("event_type")),
                 FeedOperationType.valueOf(rs.getString("operation")),
                 rs.getLong("entity_id"),
