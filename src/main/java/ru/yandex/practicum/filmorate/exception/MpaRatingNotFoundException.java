@@ -8,4 +8,8 @@ public class MpaRatingNotFoundException extends RuntimeException {
     public MpaRatingNotFoundException(String message) {
         super(message);
     }
+
+    public MpaRatingNotFoundException(Integer id) {
+        super("MPA с id " + id + " не найден");
+    }
 }

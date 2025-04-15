@@ -22,7 +22,7 @@ public class MpaService {
     public MpaRating getById(int id) {
         MpaRating rating = mpaStorage.getById(id);
         if (rating == null) {
-            throw new MpaRatingNotFoundException("MPA с id " + id + " не найден");
+            throw new MpaRatingNotFoundException(id);
         }
         return rating;
     }

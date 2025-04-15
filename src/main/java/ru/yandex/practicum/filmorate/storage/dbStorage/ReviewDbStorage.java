@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import org.springframework.dao.EmptyResultDataAccessException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -10,18 +10,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
+import static ru.yandex.practicum.filmorate.model.FeedEventType.REVIEW;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.ADD;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.REMOVE;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.UPDATE;
+
 @Repository
+@RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final FeedDbStorage feedStorage;
 
     @Override
     public Review createReview(Review review) {
@@ -42,7 +48,7 @@ public class ReviewDbStorage implements ReviewStorage {
         }, keyHolder);
 
         review.setReviewId(keyHolder.getKey().longValue());
-
+        feedStorage.save(REVIEW, ADD, review.getReviewId(), review.getUserId());
         return review;
     }
 
@@ -59,25 +65,26 @@ public class ReviewDbStorage implements ReviewStorage {
                 review.getIsPositive(),
                 review.getReviewId()
         );
+        feedStorage.save(REVIEW, UPDATE, review.getReviewId(), review.getUserId());
         return review;
     }
 
     @Override
     public Optional<Review> getById(Long id) {
         String sql = "SELECT * FROM reviews WHERE review_id = ?";
-        try {
-            Review review = jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
-            return Optional.ofNullable(review);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        return jdbcTemplate.query(sql, new ReviewMapper(), id).stream().findAny();
     }
 
 
     @Override
     public void deleteReview(Long id) {
+        Optional<Review> review = getById(id);
+        if (review.isEmpty()) {
+            return;
+        }
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql, id);
+        feedStorage.save(REVIEW, REMOVE, id, review.get().getUserId());
     }
 
     @Override
