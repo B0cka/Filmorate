@@ -144,6 +144,8 @@ public class FilmDbStorage implements FilmStorage {
                 FROM films AS f
                 JOIN film_likes AS fl ON fl.film_id = f.id
                 JOIN mpa_ratings m ON f.mpa_id = m.id
+                LEFT JOIN film_genres fg ON f.id = fg.film_id
+                LEFT JOIN genres g ON fg.genre_id = g.id
                 WHERE f.id IN (
                     SELECT fl1.film_id
                     FROM film_likes fl1
@@ -154,7 +156,10 @@ public class FilmDbStorage implements FilmStorage {
                 ORDER BY COUNT(fl.user_id) DESC;
                 """;
         List<Film> films = jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
-        films.forEach(f -> f.setLikes(getLikesByFilmId(f.getId())));
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            film.setLikes(getLikesByFilmId(film.getId()));
+        }
         return films;
     }
 
