@@ -19,10 +19,10 @@ public class GenreService {
         return genreStorage.getAllGenres();
     }
 
-    public Genre getGenreById(Long id) {
+    public Genre getGenreById(Integer id) {
         Genre genre = genreStorage.getGenreById(id);
         if (genre == null) {
-            throw new GenreNotFoundException("Жанр с id " + id + " не найден");
+            throw new GenreNotFoundException(id);
         }
         return genre;
     }
