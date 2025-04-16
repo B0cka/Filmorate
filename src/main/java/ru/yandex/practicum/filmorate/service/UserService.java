@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,12 @@ import java.util.List;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FilmDbStorage filmDbStorage;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FilmDbStorage filmDbStorage) {
         this.userStorage = userStorage;
+        this.filmDbStorage = filmDbStorage;
     }
 
     public User getUserById(Long id) {
@@ -114,5 +118,10 @@ public class UserService {
             throw new UserNotFoundException("Пользователь с id " + id + " не найден");
         }
         log.info("Пользователь с id {} удалён", id);
+    }
+
+    public List<Film> getRecommendations(Long id) {
+        log.info("Получение рекомендаций для пользователя id {}", id);
+        return filmDbStorage.getRecommendations(id);
     }
 }

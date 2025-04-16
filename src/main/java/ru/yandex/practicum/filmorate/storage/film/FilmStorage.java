@@ -28,4 +28,6 @@ public interface FilmStorage {
 
     boolean existsById(Long id);
 
+    List<Film> getRecommendations(Long id);
+
 }
