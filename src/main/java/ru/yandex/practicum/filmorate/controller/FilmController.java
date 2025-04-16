@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -9,13 +11,10 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 @RestController
 @RequestMapping("/films")
+@RequiredArgsConstructor
 public class FilmController {
 
     private final FilmService filmService;
-
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
 
     @PostMapping
     public Film create(@RequestBody Film film) {
@@ -55,9 +54,14 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(
             @RequestParam(defaultValue = "10") int count,
-            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year) {
         return filmService.getPopularFilms(count, genreId, year);
+    }
+
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(@RequestParam String query, @RequestParam() Set<String> by) {
+        return filmService.searchFilms(query, by);
     }
 
     @GetMapping("/director/{directorId}")

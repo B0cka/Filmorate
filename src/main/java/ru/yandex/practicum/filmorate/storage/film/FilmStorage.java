@@ -4,6 +4,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 public interface FilmStorage {
@@ -22,10 +23,11 @@ public interface FilmStorage {
 
     void removeLike(Long filmId, Long userId);
 
-    List<Film> getPopularFilms(int count, Long genreId, Integer year);
-
     boolean removeFilm(Long id);
 
     boolean existsById(Long id);
 
+    List<Film> getPopularFilms(int count, Integer genreId, Integer year);
+
+    Collection<Film> searchFilmsByQuery(String query, Set<String> by);
 }

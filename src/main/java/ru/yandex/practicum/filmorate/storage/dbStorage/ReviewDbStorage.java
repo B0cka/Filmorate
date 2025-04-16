@@ -162,7 +162,7 @@ public class ReviewDbStorage implements ReviewStorage {
             params = new Object[]{count};
         }
 
-        return jdbcTemplate.query(sql, params, new ReviewMapper());
+        return jdbcTemplate.query(sql, new ReviewMapper(), params);
     }
 
     public class ReviewMapper implements RowMapper<Review> {
