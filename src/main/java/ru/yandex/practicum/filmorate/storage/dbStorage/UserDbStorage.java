@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -14,14 +14,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import static ru.yandex.practicum.filmorate.model.FeedEventType.FRIEND;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.ADD;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.REMOVE;
+
 @Repository
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final FeedDbStorage feedStorage;
 
     @Override
     public User create(User user) {
@@ -82,6 +83,7 @@ public class UserDbStorage implements UserStorage {
         if (count != null && count == 0) {
             String insertSql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
             jdbcTemplate.update(insertSql, userId, friendId);
+            feedStorage.save(FRIEND, ADD, friendId, userId);
         }
     }
 
@@ -89,6 +91,7 @@ public class UserDbStorage implements UserStorage {
     public void removeFriend(Long userId, Long friendId) {
         String sql = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
+        feedStorage.save(FRIEND, REMOVE, friendId, userId);
     }
 
 
