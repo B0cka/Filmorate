@@ -285,9 +285,9 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getRecommendations(Long id) {
         String sql = """
-                SELECT f.id, f.name, f.description, f.release_date, f.duration, m.id, m.mpa_name
+                SELECT f.*, m.id, m.mpa_name
                 FROM films AS f
-                LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
+                INNER JOIN mpa_ratings m ON f.mpa_id = m.id
                 INNER JOIN (SELECT film_id FROM film_likes f_l
                 INNER JOIN (SELECT user_id2.user_id
                 FROM (SELECT film_id FROM film_likes WHERE user_id = ?) user_id1

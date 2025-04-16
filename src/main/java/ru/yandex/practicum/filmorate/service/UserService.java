@@ -1,6 +1,7 @@
 
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -16,16 +17,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
     private final FilmDbStorage filmDbStorage;
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FilmDbStorage filmDbStorage) {
-        this.userStorage = userStorage;
-        this.filmDbStorage = filmDbStorage;
-    }
 
     public User getUserById(Long id) {
         log.info("Запрос пользователя с id={}", id);
