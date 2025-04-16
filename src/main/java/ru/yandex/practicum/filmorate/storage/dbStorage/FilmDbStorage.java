@@ -355,7 +355,7 @@ public class FilmDbStorage implements FilmStorage {
         String sql = """
                 SELECT f.*, m.id, m.mpa_name
                 FROM films AS f
-                INNER JOIN mpa_ratings m ON f.mpa_id = m.id
+                LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
                 INNER JOIN (SELECT film_id FROM film_likes f_l
                 INNER JOIN (SELECT user_id2.user_id
                 FROM (SELECT film_id FROM film_likes WHERE user_id = ?) user_id1
