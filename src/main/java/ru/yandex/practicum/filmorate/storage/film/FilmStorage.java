@@ -27,6 +27,8 @@ public interface FilmStorage {
 
     boolean existsById(Long id);
 
+    List<Film> getCommonFilms(Long userId, Long friendId);
+
     List<Film> getPopularFilms(int count, Integer genreId, Integer year);
 
     Collection<Film> searchFilmsByQuery(String query, Set<String> by);

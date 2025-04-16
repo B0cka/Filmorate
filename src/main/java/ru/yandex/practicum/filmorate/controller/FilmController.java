@@ -59,9 +59,18 @@ public class FilmController {
         return filmService.getPopularFilms(count, genreId, year);
     }
 
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(
+            @RequestParam Long userId,
+            @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+
+    }
+
     @GetMapping("/search")
     public Collection<Film> searchFilms(@RequestParam String query, @RequestParam() Set<String> by) {
         return filmService.searchFilms(query, by);
+
     }
 
     @GetMapping("/director/{directorId}")
@@ -71,5 +80,5 @@ public class FilmController {
         }
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
-}
 
+}
