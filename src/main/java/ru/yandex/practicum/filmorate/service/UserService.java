@@ -30,7 +30,7 @@ public class UserService {
         log.info("Запрос пользователя с id={}", id);
         User user = userStorage.getById(id);
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id " + id + " не найден");
+            throw new UserNotFoundException(id);
         }
         return user;
     }
