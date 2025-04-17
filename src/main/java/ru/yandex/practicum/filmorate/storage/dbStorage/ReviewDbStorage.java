@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
@@ -15,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.model.FeedEventType.REVIEW;
@@ -54,20 +56,30 @@ public class ReviewDbStorage implements ReviewStorage {
 
     @Override
     public Review updateReview(@RequestBody Review review) {
-        String sql = "UPDATE reviews SET user_id = ?, content = ?, useful = ?, is_positive = ? WHERE review_id = ?";
-        if (review.getUseful() == null) {
-            review.setUseful(0);
-        }
-        jdbcTemplate.update(sql,
-                review.getUserId(),
+        String updateSql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
+        int updatedRows = jdbcTemplate.update(
+                updateSql,
                 review.getContent(),
-                review.getUseful(),
                 review.getIsPositive(),
                 review.getReviewId()
         );
+
+        if (updatedRows == 0) {
+            throw new NotFoundException("Review with ID " + review.getReviewId() + " not found.");
+        }
+
+        String selectSql = "SELECT user_id, film_id, useful FROM reviews WHERE review_id = ?";
+        Map<String, Object> result = jdbcTemplate.queryForMap(selectSql, review.getReviewId());
+
+        review.setUserId(Long.valueOf((Integer) result.get("user_id")));
+        review.setFilmId(Long.valueOf((Integer) result.get("film_id")));
+        review.setUseful(Integer.valueOf((Integer) result.get("useful")));
+
         feedStorage.save(REVIEW, UPDATE, review.getReviewId(), review.getUserId());
-        return review;
+
+        return review; // ✅ возвращается полный объект
     }
+
 
     @Override
     public Optional<Review> getById(Long id) {
