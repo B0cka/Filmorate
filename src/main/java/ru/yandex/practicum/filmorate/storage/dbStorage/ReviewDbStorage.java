@@ -77,7 +77,7 @@ public class ReviewDbStorage implements ReviewStorage {
 
         feedStorage.save(REVIEW, UPDATE, review.getReviewId(), review.getUserId());
 
-        return review; // ✅ возвращается полный объект
+        return review;
     }
 
 

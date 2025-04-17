@@ -237,9 +237,8 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public void addLike(Long filmId, Long userId) {
         String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
-        if (jdbcTemplate.update(sql, filmId, userId) > 0) {
-            feedStorage.save(LIKE, ADD, filmId, userId);
-        }
+        jdbcTemplate.update(sql, filmId, userId);
+        feedStorage.save(LIKE, ADD, filmId, userId);
     }
 
     @Override
