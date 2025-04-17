@@ -61,13 +61,11 @@ public class FeedDbStorage implements FeedStorage {
                 "fr.event_id, fr.entity_id " +
                 "FROM feed_records fr " +
                 "WHERE fr.user_id = ? " +
-                "OR fr.user_id IN (SELECT friend_id FROM friendships WHERE user_id = ?) " +
                 "ORDER BY fr.timestamp ASC";
 
         return jdbcTemplate.query(
                 sql,
                 this::mapRowToFeedRecord,
-                userId,
                 userId
         );
     }
