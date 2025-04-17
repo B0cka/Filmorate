@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface FeedStorage {
+
     FeedRecord save(FeedEventType eventType, FeedOperationType operation, Long entityId, Long userId);
 
     Optional<FeedRecord> getById(Long eventId);
