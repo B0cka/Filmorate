@@ -350,6 +350,35 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
+    @Override
+    public List<Film> getRecommendations(Long id) {
+        String sql = """
+                SELECT f.*, m.id, m.mpa_name
+                FROM films AS f
+                LEFT JOIN mpa_ratings m ON f.mpa_id = m.id
+                INNER JOIN (SELECT film_id FROM film_likes f_l
+                INNER JOIN (SELECT user_id2.user_id
+                FROM (SELECT film_id FROM film_likes WHERE user_id = ?) user_id1
+                LEFT JOIN film_likes user_id2
+                ON user_id1.film_id = user_id2.film_id AND user_id2.user_id <> ?
+                GROUP BY user_id2.user_id
+                ORDER BY COUNT(user_id2.film_id) DESC
+                LIMIT 1) curr_user
+                ON f_l.user_id = curr_user.user_id
+                EXCEPT
+                SELECT film_id FROM film_likes WHERE user_id = ?) ff
+                ON f.id = ff.film_id
+                """;
+
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(), id, id, id);
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            film.setLikes(getLikesByFilmId(film.getId()));
+            film.setDirectors(getDirectorsByFilmId(film.getId()));
+        }
+        return films;
+    }
+
     public class FilmMapper implements RowMapper<Film> {
         @Override
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
