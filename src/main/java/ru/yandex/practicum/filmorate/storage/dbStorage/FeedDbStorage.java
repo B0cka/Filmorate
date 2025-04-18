@@ -27,7 +27,7 @@ public class FeedDbStorage implements FeedStorage {
     @Override
     public FeedRecord save(FeedEventType eventType, FeedOperationType operation, Long entityId, Long userId) {
         String sql = "INSERT INTO feed_records (user_id, event_type, operation, entity_id) " +
-            "VALUES (?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
