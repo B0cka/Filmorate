@@ -16,3 +16,8 @@ DELETE FROM genres;
 ALTER TABLE genres ALTER COLUMN id RESTART WITH 1;
 INSERT INTO genres (name) VALUES ('Комедия'), ('Драма'), ('Мультфильм'), ('Триллер'), ('Документальный'), ('Боевик');
 
+DELETE FROM reviews;
+ALTER TABLE reviews ALTER COLUMN review_id RESTART WITH 1;
+
+DELETE FROM feed_records;
+ALTER TABLE feed_records ALTER COLUMN event_id RESTART WITH 1;

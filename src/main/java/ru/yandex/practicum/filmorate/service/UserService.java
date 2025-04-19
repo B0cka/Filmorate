@@ -2,12 +2,14 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
+import ru.yandex.practicum.filmorate.model.FeedRecord;
+import ru.yandex.practicum.filmorate.storage.user.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +23,14 @@ import java.util.List;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FilmDbStorage filmDbStorage;
+    private final FeedStorage feedStorage;
 
     public User getUserById(Long id) {
         log.info("Запрос пользователя с id={}", id);
         User user = userStorage.getById(id);
         if (user == null) {
-            throw new UserNotFoundException("Пользователь с id " + id + " не найден");
+            throw new UserNotFoundException(id);
         }
         return user;
     }
@@ -84,7 +88,7 @@ public class UserService {
 
     public void getByIdForVal(Long id) {
         if (userStorage.getById(id) == null) {
-            throw new UserNotFoundException("User с id " + id + " не найден");
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -105,5 +109,25 @@ public class UserService {
 
     public Collection<User> getAll() {
         return userStorage.getAll();
+    }
+
+    public void removeUser(Long id) {
+        if (!userStorage.removeUser(id)) {
+            log.error("Ошибка удаления пользователя id {}", id);
+            throw new UserNotFoundException(id);
+        }
+        log.info("Пользователь с id {} удалён", id);
+    }
+
+
+    public List<Film> getRecommendations(Long id) {
+        log.info("Получение рекомендаций для пользователя id {}", id);
+        return filmDbStorage.getRecommendations(id);
+    }
+
+    public Collection<FeedRecord> getFeed(Long userId) {
+        getUserById(userId);
+        return feedStorage.getFeedForUser(userId);
+
     }
 }

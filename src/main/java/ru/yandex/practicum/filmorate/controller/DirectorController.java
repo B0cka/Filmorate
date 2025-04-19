@@ -31,22 +31,24 @@ public class DirectorController {
 
     @PostMapping
     public Director createDirector(@RequestBody Director director) {
-        if (director.getName() == null || director.getName().isBlank()) {
-            throw new ValidationException("Имя режиссера не должно быть пустым");
-        }
+        checkDirectorName(director);
         return directorService.createDirector(director);
     }
 
     @PutMapping
     public Director updateDirector(@RequestBody Director director) {
-        if (director.getName() == null || director.getName().isBlank()) {
-            throw new ValidationException("Имя режиссера не должно быть пустым");
-        }
+        checkDirectorName(director);
         return directorService.updateDirector(director);
     }
 
     @DeleteMapping("/{directorId}")  // Добавить {directorId} в путь
     public void deleteDirector(@PathVariable Long directorId) {
         directorService.deleteDirector(directorId);
+    }
+
+    private void checkDirectorName(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            throw new ValidationException("Имя режиссера не должно быть пустым");
+        }
     }
 }

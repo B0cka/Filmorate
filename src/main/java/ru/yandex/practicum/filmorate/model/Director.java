@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class Director {
     private String name;
-    private long id;
+    private Long id;
 }

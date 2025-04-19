@@ -1,26 +1,36 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static ru.yandex.practicum.filmorate.model.FeedEventType.REVIEW;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.ADD;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.REMOVE;
+import static ru.yandex.practicum.filmorate.model.FeedOperationType.UPDATE;
 
 @Repository
 @RequiredArgsConstructor
 public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final FeedDbStorage feedStorage;
 
     @Override
     public Review createReview(Review review) {
@@ -41,42 +51,53 @@ public class ReviewDbStorage implements ReviewStorage {
         }, keyHolder);
 
         review.setReviewId(keyHolder.getKey().longValue());
-
+        feedStorage.save(REVIEW, ADD, review.getReviewId(), review.getUserId());
         return review;
     }
 
     @Override
     public Review updateReview(@RequestBody Review review) {
-        String sql = "UPDATE reviews SET user_id = ?, content = ?, useful = ?, is_positive = ? WHERE review_id = ?";
-        if (review.getUseful() == null) {
-            review.setUseful(0);
-        }
-        jdbcTemplate.update(sql,
-                review.getUserId(),
+        String updateSql = "UPDATE reviews SET content = ?, is_positive = ? WHERE review_id = ?";
+        int updatedRows = jdbcTemplate.update(
+                updateSql,
                 review.getContent(),
-                review.getUseful(),
                 review.getIsPositive(),
                 review.getReviewId()
         );
+
+        if (updatedRows == 0) {
+            throw new NotFoundException("Review with ID " + review.getReviewId() + " not found.");
+        }
+
+        String selectSql = "SELECT user_id, film_id, useful FROM reviews WHERE review_id = ?";
+        Map<String, Object> result = jdbcTemplate.queryForMap(selectSql, review.getReviewId());
+
+        review.setUserId(Long.valueOf((Integer) result.get("user_id")));
+        review.setFilmId(Long.valueOf((Integer) result.get("film_id")));
+        review.setUseful(Integer.valueOf((Integer) result.get("useful")));
+
+        feedStorage.save(REVIEW, UPDATE, review.getReviewId(), review.getUserId());
+
         return review;
     }
+
 
     @Override
     public Optional<Review> getById(Long id) {
         String sql = "SELECT * FROM reviews WHERE review_id = ?";
-        try {
-            Review review = jdbcTemplate.queryForObject(sql, new ReviewMapper(), id);
-            return Optional.ofNullable(review);
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
+        return jdbcTemplate.query(sql, new ReviewMapper(), id).stream().findAny();
     }
 
 
     @Override
     public void deleteReview(Long id) {
+        Optional<Review> review = getById(id);
+        if (review.isEmpty()) {
+            return;
+        }
         String sql = "DELETE FROM reviews WHERE review_id = ?";
         jdbcTemplate.update(sql, id);
+        feedStorage.save(REVIEW, REMOVE, id, review.get().getUserId());
     }
 
     @Override
@@ -161,7 +182,7 @@ public class ReviewDbStorage implements ReviewStorage {
             params = new Object[]{count};
         }
 
-        return jdbcTemplate.query(sql, params, new ReviewMapper());
+        return jdbcTemplate.query(sql, new ReviewMapper(), params);
     }
 
     public class ReviewMapper implements RowMapper<Review> {

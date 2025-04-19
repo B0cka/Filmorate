@@ -1,5 +1,3 @@
-package usertests;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -18,13 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = FilmorateApplication.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Import(UserDbStorage.class)
-public class UserTest {
+class UserTest {
 
     @Autowired
     private UserDbStorage userStorage;
 
     @Test
-    public void testCreateAndFindUserById() {
+    void testCreateAndFindUserById() {
 
         User user = new User();
         user.setEmail("mail@example.com");
@@ -48,14 +46,14 @@ public class UserTest {
     }
 
     @Test
-    public void testUpdateUser() {
+    void testUpdateUser() {
         User user = new User();
         user.setEmail("mail@example.com");
         user.setLogin("testLogin_2");
         user.setName("Test User");
         user.setBirthday(LocalDate.of(1990, 1, 1));
 
-        User created = userStorage.create(user);
+        userStorage.create(user);
 
         user.setEmail("mail@example.com.yup");
         user.setLogin("testLogin_22211155");
@@ -78,7 +76,7 @@ public class UserTest {
     }
 
     @Test
-    public void testCreateUserAndAddFriend() {
+    void testCreateUserAndAddFriend() {
 
         User user = new User();
         user.setEmail("user@example.com");
@@ -102,11 +100,11 @@ public class UserTest {
 
         assertThat(friends)
                 .isNotEmpty()
-                .anyMatch(f -> f.getId() == friendId);
+                .anyMatch(f -> f.getId().equals(friendId));
     }
 
     @Test
-    public void testRemoveUserAndAddFriend() {
+    void testRemoveUserAndAddFriend() {
 
         User user = new User();
         user.setEmail("user@example.com.but");
@@ -133,7 +131,7 @@ public class UserTest {
     }
 
     @Test
-    public void testGetCommonFriends() {
+    void testGetCommonFriends() {
 
         User user = new User();
         user.setEmail("user@example.but");

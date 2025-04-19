@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -26,9 +26,9 @@ public class FilmController {
         return filmService.update(newFilm);
     }
 
-    @DeleteMapping("/{id}")
-    public void removeFilms(@PathVariable Long id) {
-        filmService.removeFilms(id);
+    @DeleteMapping("/{filmId}")
+    public void removeFilm(@PathVariable Long filmId) {
+        filmService.removeFilm(filmId);
     }
 
     @GetMapping
@@ -54,9 +54,23 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(
             @RequestParam(defaultValue = "10") int count,
-            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) Integer year) {
         return filmService.getPopularFilms(count, genreId, year);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(
+            @RequestParam Long userId,
+            @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+
+    }
+
+    @GetMapping("/search")
+    public Collection<Film> searchFilms(@RequestParam String query, @RequestParam() Set<String> by) {
+        return filmService.searchFilms(query, by);
+
     }
 
     @GetMapping("/director/{directorId}")
@@ -66,5 +80,5 @@ public class FilmController {
         }
         return filmService.getFilmsByDirector(directorId, sortBy);
     }
-}
 
+}

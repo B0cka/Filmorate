@@ -79,10 +79,10 @@ public class ReviewService {
     private void validateReview(Review review) {
 
         if (userStorage.getById(review.getUserId()) == null) {
-            throw new UserNotFoundException("Юзера с Id не существует!: " + review.getUserId());
+            throw new UserNotFoundException(review.getUserId());
         }
         if (filmStorage.getById(review.getFilmId()) == null) {
-            throw new FilmNotFoundException("film с Id не существует!: " + review.getFilmId());
+            throw new FilmNotFoundException(review.getFilmId());
         }
         if (review.getFilmId() == null || review.getFilmId() <= 0) {
             throw new FilmNotFoundException("Некорректный filmId: " + review.getFilmId());
