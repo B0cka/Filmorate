@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class FeedRecord {
-    Long eventId;
-    Long timestamp;
-    FeedEventType eventType;
-    FeedOperationType operation;
-    Long entityId;
-    Long userId;
+    private Long eventId;
+    private Long timestamp;
+    private FeedEventType eventType;
+    private FeedOperationType operation;
+    private Long entityId;
+    private Long userId;
 }
