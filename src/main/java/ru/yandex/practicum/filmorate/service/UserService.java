@@ -1,6 +1,8 @@
 
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -13,15 +15,12 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
-
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     public User getUserById(Long id) {
         log.info("Запрос пользователя с id={}", id);

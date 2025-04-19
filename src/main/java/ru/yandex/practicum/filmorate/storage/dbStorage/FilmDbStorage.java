@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,15 +21,11 @@ import java.util.List;
 import java.util.Set;
 
 @Repository
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final DirectorDbStorage directorDbStorage;
-
-    public FilmDbStorage(JdbcTemplate jdbcTemplate, DirectorDbStorage directorDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.directorDbStorage = new DirectorDbStorage(jdbcTemplate);
-    }
 
     @Override
     public Film create(Film film) {
