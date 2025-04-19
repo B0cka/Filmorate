@@ -2,6 +2,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -11,8 +12,6 @@ import ru.yandex.practicum.filmorate.storage.dbStorage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.model.FeedRecord;
 import ru.yandex.practicum.filmorate.storage.user.FeedStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
