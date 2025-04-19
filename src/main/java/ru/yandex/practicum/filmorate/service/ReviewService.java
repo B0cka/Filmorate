@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -15,17 +16,13 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
-    public ReviewService(ReviewStorage reviewStorage,UserStorage userStorage, FilmStorage filmStorage) {
-        this.reviewStorage = reviewStorage;
-        this.userStorage = userStorage;
-        this.filmStorage = filmStorage;
-    }
 
     public Review createReview(Review review) {
         validateReview(review);

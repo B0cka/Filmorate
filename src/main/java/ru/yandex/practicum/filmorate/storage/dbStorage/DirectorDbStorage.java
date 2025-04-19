@@ -24,7 +24,6 @@ import java.util.Set;
 public class DirectorDbStorage implements DirectorStorage {
     private final JdbcTemplate jdbcTemplate;
 
-
     @Override
     public Set<Director> getAllDirectors() {
         String sql = "SELECT director_id, name FROM directors";
