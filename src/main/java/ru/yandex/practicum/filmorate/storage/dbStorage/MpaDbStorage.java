@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dbStorage;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
