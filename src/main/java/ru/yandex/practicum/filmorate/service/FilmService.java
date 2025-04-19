@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class FilmService {
 
     private final FilmStorage filmStorage;
@@ -30,16 +32,6 @@ public class FilmService {
     private final DirectorStorage directorStorage;
     private static final Logger log = LoggerFactory.getLogger(FilmService.class);
 
-    @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage,
-                       GenreStorage genreStorage, MpaStorage mpaStorage, DirectorStorage directorStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-        this.genreStorage = genreStorage;
-        this.mpaStorage = mpaStorage;
-        this.directorStorage = directorStorage;
-    }
 
     public Film create(Film film) {
         validateFilm(film);
